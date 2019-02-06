@@ -1,15 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using ConsoleTables;
 
 namespace SubwayMapRender {
     public static class OutputHelper {
 
         public static void OutputLineList(List<DataStruct.LineItem> obj) {
-            ConsoleAssistance.WriteLine("Name\tColor\tNode count", ConsoleColor.Yellow);
+            var table = new ConsoleTable("Name", "Color", "Node count");
             foreach (var item in obj) {
-                Console.WriteLine($"{item.LineName}\t{item.LineColor.ToString()}\t{item.NodeList.Count}");
+                table.AddRow(item.LineName, item.LineColor.ToString(), item.NodeList.Count.ToString());
             }
+            Console.Write(table.ToStringAlternative());
+            Console.WriteLine();
         }
 
         public static void OutputLineItem(DataStruct.LineItem data) {
@@ -18,25 +21,16 @@ namespace SubwayMapRender {
             ConsoleAssistance.Write("Line color: ", ConsoleColor.Yellow);
             Console.WriteLine(data.LineColor.ToString());
             ConsoleAssistance.WriteLine("Line node list: ", ConsoleColor.Yellow);
-            Console.WriteLine("Index\tPosition\tAttached station id\tRail width\tIs building?");
-            int index = 0;
-            foreach (var item in data.NodeList) {
-                Console.WriteLine($"{index}\t{item.NodePosition.ToString()}\t{item.AttachedStationId}\t{item.FollowingRailwayWidth}\t{item.FollowingRailIsBuilding}");
-                Console.WriteLine("\tIndex\tSegment\tBuilder");
-                int innerIndex = 0;
-                foreach (var innerItem in item.FollowingBuilder) {
-                    Console.WriteLine($"\t{innerIndex}\t{innerItem.Segment}\t{innerItem.Builder}");
-                    innerIndex++;
-                }
-                index++;
-            }
+            OutputNodeList(data.NodeList);
         }
 
         public static void OutputStationList(List<DataStruct.StationItem> obj) {
-            ConsoleAssistance.WriteLine("Id\tName\tIs building?\tRender direction\tRender Offset\tBuilder count\tLayout count", ConsoleColor.Yellow);
+            var table = new ConsoleTable("Id", "Name", "Is building?", "Render direction", "Render Offset", "Builder count", "Layout count");
             foreach (var item in obj) {
-                Console.WriteLine($"{item.StationId}\t{item.StationName}\t{item.IsBuilding}\t{item.RenderDirection}\t{item.RenderOffset}\t{item.Builder.Count}\t{item.StationLayoutList.Count}");
+                table.AddRow(item.StationId, item.StationName, item.IsBuilding.ToString(), item.RenderDirection.ToString(), item.RenderOffset.ToString(), item.Builder.Count.ToString(), item.StationLayoutList.Count.ToString());
             }
+            Console.Write(table.ToStringAlternative());
+            Console.WriteLine();
         }
 
         public static void OutputStationItem(DataStruct.StationItem data) {
@@ -51,15 +45,11 @@ namespace SubwayMapRender {
             ConsoleAssistance.Write("Render offset: ", ConsoleColor.Yellow);
             Console.WriteLine(data.RenderOffset);
             ConsoleAssistance.WriteLine("Builder list: ", ConsoleColor.Yellow);
-            Console.WriteLine("Index\tSegment\tBuilder");
-            int index = 0;
-            foreach (var item in data.Builder) {
-                Console.WriteLine($"{index}\t{item.Segment}\t{item.Builder}");
-                index++;
-            }
+            OutputBuilderList(data.Builder);
             ConsoleAssistance.WriteLine("Layout list: ", ConsoleColor.Yellow);
+            
             Console.WriteLine("Index\tFloor\tIs horizon layout\tRail count");
-            index = 0;
+            int index = 0;
             foreach (var item in data.StationLayoutList) {
                 Console.WriteLine($"{index}\t{item.Floor}\t{item.IsHorizonStationLayout}\t{item.RailLayoutList.Count}");
                 index++;
@@ -67,25 +57,31 @@ namespace SubwayMapRender {
         }
 
         public static void OutputNodeList(List<DataStruct.LineNodeItem> obj) {
+            var table = new ConsoleTable("Index", "Position", "Attached station id", "Rail width", "Is building?");
             int index = 0;
             foreach (var item in obj) {
-                Console.WriteLine($"{index}\t{item.NodePosition.ToString()}\t{item.AttachedStationId}\t{item.FollowingRailwayWidth}\t{item.FollowingRailIsBuilding}");
-                Console.WriteLine("\tIndex\tSegment\tBuilder");
+                table.AddRow(index.ToString(), item.NodePosition.ToString(), item.AttachedStationId, item.FollowingRailwayWidth.ToString(), item.FollowingRailIsBuilding.ToString());
+                table.AddRow("==Builder==>", "Index", "Segment", "Builder", "");
                 int innerIndex = 0;
                 foreach (var innerItem in item.FollowingBuilder) {
-                    Console.WriteLine($"\t{innerIndex}\t{innerItem.Segment}\t{innerItem.Builder}");
+                    table.AddRow("", innerIndex.ToString(), innerItem.Segment, innerItem.Builder, "");
                     innerIndex++;
                 }
                 index++;
             }
+            Console.Write(table.ToStringAlternative());
+            Console.WriteLine();
         }
 
         public static void OutputBuilderList(List<DataStruct.BuilderItem> obj) {
+            var table = new ConsoleTable("Index", "Segment", "Builder");
             int innerIndex = 0;
-            foreach (var innerItem in obj) {
-                Console.WriteLine($"\t{innerIndex}\t{innerItem.Segment}\t{innerItem.Builder}");
+            foreach (var item in obj) {
+                table.AddRow(innerIndex.ToString(), item.Segment, item.Builder);
                 innerIndex++;
             }
+            Console.Write(table.ToStringAlternative());
+            Console.WriteLine();
         }
 
         public static void OutputLayoutList(List<DataStruct.StationLayoutItem> data) {

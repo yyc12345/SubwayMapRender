@@ -16,9 +16,9 @@ namespace SubwayMapRender.DataStruct {
 
         public static string ColorToHexString(Color col) {
             var res = "#";
-            res += DecToHex(col.R / 16) + DecToHex(col.R % 16);
-            res += DecToHex(col.G / 16) + DecToHex(col.G % 16);
-            res += DecToHex(col.B / 16) + DecToHex(col.B % 16);
+            res += $"{DecToHex(col.R / 16)}{DecToHex(col.R % 16)}";
+            res += $"{DecToHex(col.G / 16)}{DecToHex(col.G % 16)}";
+            res += $"{DecToHex(col.B / 16)}{DecToHex(col.B % 16)}";
             return res;
         }
 

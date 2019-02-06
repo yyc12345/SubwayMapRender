@@ -152,7 +152,7 @@ namespace SubwayMapRender {
                             return true;
                         }
 
-                        if (index < 0 || index > obj.Count) {
+                        if (index < 0 || index >= obj.Count) {
                             ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
                             return true;
                         }
@@ -167,6 +167,7 @@ namespace SubwayMapRender {
                     Help();
                     break;
                 default:
+                    ConsoleAssistance.WriteLine("Unknow command", ConsoleColor.Red);
                     break;
             }
 
@@ -304,6 +305,7 @@ namespace SubwayMapRender {
                     Help();
                     break;
                 default:
+                    ConsoleAssistance.WriteLine("Unknow command", ConsoleColor.Red);
                     break;
             }
 
@@ -394,7 +396,7 @@ namespace SubwayMapRender {
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "edit":
-                    if (sp.Count == 3) {
+                    if (sp.Count == 5) {
                         //search
                         var search = from item in obj
                                      where item.StationId == sp[0]
@@ -472,6 +474,7 @@ namespace SubwayMapRender {
                     Help();
                     break;
                 default:
+                    ConsoleAssistance.WriteLine("Unknow command", ConsoleColor.Red);
                     break;
             }
 
@@ -571,7 +574,7 @@ namespace SubwayMapRender {
                             return true;
                         }
 
-                        if (index < 0 || index > obj.Count) {
+                        if (index < 0 || index >= obj.Count) {
                             ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
                             return true;
                         }
@@ -595,7 +598,7 @@ namespace SubwayMapRender {
                             return true;
                         }
 
-                        if (index < 0 || index > obj.Count) {
+                        if (index < 0 || index >= obj.Count) {
                             ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
                             return true;
                         }
@@ -620,7 +623,7 @@ namespace SubwayMapRender {
                             return true;
                         }
 
-                        if (index < 0 || index > obj.Count) {
+                        if (index < 0 || index >= obj.Count) {
                             ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
                             return true;
                         }
@@ -644,7 +647,7 @@ namespace SubwayMapRender {
                             return true;
                         }
 
-                        if (index < 0 || index > obj.Count) {
+                        if (index < 0 || index >= obj.Count) {
                             ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
                             return true;
                         }
@@ -665,6 +668,7 @@ namespace SubwayMapRender {
                     Help();
                     break;
                 default:
+                    ConsoleAssistance.WriteLine("Unknow command", ConsoleColor.Red);
                     break;
             }
 
@@ -748,7 +752,33 @@ namespace SubwayMapRender {
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "edit":
-                    if (sp.Count == 1) {
+                    if (sp.Count == 3) {
+                        //check param
+                        int index;
+                        bool isHorizon = true;
+                        try {
+                            index = int.Parse(sp[0]);
+                            if (sp[2] != "~")
+                                isHorizon = bool.Parse(sp[2]);
+                        } catch (Exception) {
+                            ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        if (index < 0 || index >= obj.Count) {
+                            ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        if (sp[1] != "~")
+                            obj[index].Floor = sp[1];
+                        if (sp[2] != "~")
+                            obj[index].IsHorizonStationLayout = isHorizon;
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "rail":
+                    if (sp.Count == 2) {
                         //check param
                         int index;
                         string[] spData;
@@ -789,6 +819,7 @@ namespace SubwayMapRender {
                     Help();
                     break;
                 default:
+                    ConsoleAssistance.WriteLine("Unknow command", ConsoleColor.Red);
                     break;
             }
 
