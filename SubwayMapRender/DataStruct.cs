@@ -22,6 +22,24 @@ namespace SubwayMapRender.DataStruct {
             return res;
         }
 
+        public static RailToward StringToToward(char chr) {
+            if (chr >= 'A' && chr <= 'Z') chr = (char)(chr - 'A' + 'a');
+            switch (chr) {
+                case 'n':
+                    return RailToward.None;
+                case 'u':
+                    return RailToward.Up;
+                case 'd':
+                    return RailToward.Down;
+                case 'l':
+                    return RailToward.Left;
+                case 'r':
+                    return RailToward.Right;
+                default:
+                    return RailToward.None;
+            }
+        }
+
         static int HexToDec(char chr) {
             if (chr >= 'a' && chr <= 'f') return 10 + chr - 'a';
             else return chr - '0';
@@ -120,12 +138,16 @@ namespace SubwayMapRender.DataStruct {
         public StationItem() {
             StationId = "";
             StationName = "";
+            RenderDirection = 0;
+            RenderOffset = 10;
             Builder = new List<BuilderItem>();
             StationLayoutList = new List<StationLayoutItem>();
         }
         public string StationId { get; set; }
         public string StationName { get; set; }
         public bool IsBuilding { get; set; }
+        public int RenderDirection { get; set; }
+        public int RenderOffset { get; set; }
         public List<BuilderItem> Builder { get; set; }
         public List<StationLayoutItem> StationLayoutList { get; set; }
     }

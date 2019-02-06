@@ -8,6 +8,7 @@ namespace SubwayMapRender {
     public static class Command {
 
         static Regex hexColorRegex = new Regex("#[0123456789abcdefABCDEF]{6}");
+        static Regex railLayoutRegex = new Regex("[NUDLRuudlr]{1}#[0123456789abcdefABCDEF]{6}");
 
         /// <summary>
         /// Command processor
@@ -73,12 +74,7 @@ namespace SubwayMapRender {
             switch (main) {
                 case "ls":
                     if (sp.Count == 0) {
-                        int innerIndex = 0;
-                        foreach (var innerItem in obj) {
-                            Console.WriteLine($"\t{innerIndex}\t{innerItem.Segment}\t{innerItem.Builder}");
-                            innerIndex++;
-                        }
-
+                        OutputHelper.OutputBuilderList(obj);
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "new":
@@ -186,10 +182,7 @@ namespace SubwayMapRender {
             switch (main) {
                 case "ls":
                     if (sp.Count == 0) {
-                        ConsoleAssistance.WriteLine("Name\tColor\tNode count", ConsoleColor.Yellow);
-                        foreach (var item in obj) {
-                            Console.WriteLine($"{item.LineName}\t{item.LineColor.ToString()}\t{item.NodeList.Count}");
-                        }
+                        OutputHelper.OutputLineList(obj);
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "info":
@@ -205,23 +198,7 @@ namespace SubwayMapRender {
 
                         //list
                         var data = search.First();
-                        ConsoleAssistance.Write("Line name: ");
-                        Console.WriteLine(data.LineName);
-                        ConsoleAssistance.Write("Line color: ");
-                        Console.WriteLine(data.LineColor.ToString());
-                        ConsoleAssistance.Write("Line node list: ");
-                        Console.WriteLine("Index\tPosition\tAttached station id\tRail width\tIs building?");
-                        int index = 0;
-                        foreach (var item in data.NodeList) {
-                            Console.WriteLine($"{index}\t{item.NodePosition.ToString()}\t{item.AttachedStationId}\t{item.FollowingRailwayWidth}\t{item.FollowingRailIsBuilding}");
-                            Console.WriteLine("\tIndex\tSegment\tBuilder");
-                            int innerIndex = 0;
-                            foreach (var innerItem in item.FollowingBuilder) {
-                                Console.WriteLine($"\t{innerIndex}\t{innerItem.Segment}\t{innerItem.Builder}");
-                                innerIndex++;
-                            }
-                            index++;
-                        }
+                        OutputHelper.OutputLineItem(data);
 
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
@@ -340,6 +317,155 @@ namespace SubwayMapRender {
             var main = sp[0];
             sp.RemoveAt(0);
             switch (main) {
+                case "ls":
+                    if (sp.Count == 0) {
+                        OutputHelper.OutputStationList(obj);
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "info":
+                    if (sp.Count == 1) {
+                        //search
+                        var search = from item in obj
+                                     where item.StationId == sp[0]
+                                     select item;
+                        if (!search.Any()) {
+                            ConsoleAssistance.WriteLine("No matched item", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        //list
+                        var data = search.First();
+                        OutputHelper.OutputStationItem(data);
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "new":
+                    if (sp.Count == 1) {
+                        //search
+                        var search = from item in obj
+                                     where item.StationId == sp[0]
+                                     select item;
+                        if (search.Any()) {
+                            ConsoleAssistance.WriteLine("Existed id", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        obj.Add(new DataStruct.StationItem() { StationId = sp[0] });
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "rm":
+                    if (sp.Count == 1) {
+                        //search
+                        var search = from item in obj
+                                     where item.StationId == sp[0]
+                                     select item;
+                        if (!search.Any()) {
+                            ConsoleAssistance.WriteLine("No matched item", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        obj.Remove(search.First());
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "re":
+                    if (sp.Count == 2) {
+                        //search
+                        var search = from item in obj
+                                     where item.StationId == sp[0]
+                                     select item;
+                        if (!search.Any()) {
+                            ConsoleAssistance.WriteLine("No matched item", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        //check name
+                        var search2 = from item in obj
+                                      where item.StationId == sp[1]
+                                      select item;
+                        if (search2.Any()) {
+                            ConsoleAssistance.WriteLine("Existed id", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        search.First().StationId = sp[1];
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "edit":
+                    if (sp.Count == 3) {
+                        //search
+                        var search = from item in obj
+                                     where item.StationId == sp[0]
+                                     select item;
+                        if (!search.Any()) {
+                            ConsoleAssistance.WriteLine("No matched item", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        //check param
+                        bool isBuilding = false;
+                        int renderDirection = 0, renderOffset = 0;
+                        try {
+                            if (sp[2] != "~") isBuilding = bool.Parse(sp[2]);
+                            if (sp[3] != "~") renderDirection = int.Parse(sp[3]);
+                            if (sp[4] != "~") renderOffset = int.Parse(sp[4]);
+                        } catch (Exception) {
+                            ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        var cache = search.First();
+                        if (sp[1] != "~") cache.StationName = sp[1];
+                        if (sp[2] != "~") cache.IsBuilding = isBuilding;
+                        if (sp[3] != "~") cache.RenderDirection = renderDirection;
+                        if (sp[4] != "~") cache.RenderOffset = renderOffset;
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "builder":
+                    if (sp.Count == 1) {
+                        //search
+                        var search = from item in obj
+                                     where item.StationId == sp[0]
+                                     select item;
+                        if (!search.Any()) {
+                            ConsoleAssistance.WriteLine("No matched item", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        var inputObj = search.First();
+                        var innerCommand = "";
+                        while (true) {
+                            ConsoleAssistance.Write($"Builder editor ({inputObj.StationId} - {inputObj.StationName})> ", ConsoleColor.Green);
+                            innerCommand = Console.ReadLine();
+                            if (!BuilderProcessor(innerCommand, inputObj.Builder)) break;
+                        }
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "layout":
+                    if (sp.Count == 1) {
+                        //search
+                        var search = from item in obj
+                                     where item.StationId == sp[0]
+                                     select item;
+                        if (!search.Any()) {
+                            ConsoleAssistance.WriteLine("No matched item", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        var inputObj = search.First();
+                        var innerCommand = "";
+                        while (true) {
+                            ConsoleAssistance.Write($"Layout editor ({inputObj.StationId} - {inputObj.StationName})> ", ConsoleColor.Green);
+                            innerCommand = Console.ReadLine();
+                            if (!LayoutProcessor(innerCommand, inputObj.StationLayoutList)) break;
+                        }
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
                 case "back":
                     return false;
                 case "help":
@@ -361,17 +487,7 @@ namespace SubwayMapRender {
             switch (main) {
                 case "ls":
                     if (sp.Count == 0) {
-                        int index = 0;
-                        foreach (var item in obj) {
-                            Console.WriteLine($"{index}\t{item.NodePosition.ToString()}\t{item.AttachedStationId}\t{item.FollowingRailwayWidth}\t{item.FollowingRailIsBuilding}");
-                            Console.WriteLine("\tIndex\tSegment\tBuilder");
-                            int innerIndex = 0;
-                            foreach (var innerItem in item.FollowingBuilder) {
-                                Console.WriteLine($"\t{innerIndex}\t{innerItem.Segment}\t{innerItem.Builder}");
-                                innerIndex++;
-                            }
-                            index++;
-                        }
+                        OutputHelper.OutputNodeList(obj);
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "new":
@@ -441,12 +557,15 @@ namespace SubwayMapRender {
                 case "pos":
                     if (sp.Count == 4) {
                         //check param
-                        int index, x, y, z;
+                        int index, x = 0, y = 0, z = 0;
                         try {
                             index = int.Parse(sp[0]);
-                            x = int.Parse(sp[1]);
-                            y = int.Parse(sp[2]);
-                            z = int.Parse(sp[3]);
+                            if (sp[1] != "~")
+                                x = int.Parse(sp[1]);
+                            if (sp[2] != "~")
+                                y = int.Parse(sp[2]);
+                            if (sp[3] != "~")
+                                z = int.Parse(sp[3]);
                         } catch (Exception) {
                             ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
                             return true;
@@ -456,6 +575,10 @@ namespace SubwayMapRender {
                             ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
                             return true;
                         }
+
+                        if (sp[1] == "~") x = obj[index].NodePosition.X;
+                        if (sp[2] == "~") y = obj[index].NodePosition.Y;
+                        if (sp[3] == "~") z = obj[index].NodePosition.Z;
 
                         obj[index].NodePosition = new DataStruct.Coordinate(x, y, z);
 
@@ -484,12 +607,14 @@ namespace SubwayMapRender {
                 case "following":
                     if (sp.Count == 3) {
                         //check param
-                        int index, railWidth;
-                        bool isBuilding;
+                        int index, railWidth = 0;
+                        bool isBuilding = false;
                         try {
                             index = int.Parse(sp[0]);
-                            railWidth = int.Parse(sp[1]);
-                            isBuilding = bool.Parse(sp[2]);
+                            if (sp[1] != "~")
+                                railWidth = int.Parse(sp[1]);
+                            if (sp[1] != "~")
+                                isBuilding = bool.Parse(sp[2]);
                         } catch (Exception) {
                             ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
                             return true;
@@ -500,8 +625,11 @@ namespace SubwayMapRender {
                             return true;
                         }
 
-                        obj[index].FollowingRailIsBuilding = isBuilding;
-                        obj[index].FollowingRailwayWidth = railWidth;
+                        if (sp[1] != "~")
+                            obj[index].FollowingRailwayWidth = railWidth;
+                        if (sp[2] != "~")
+                            obj[index].FollowingRailIsBuilding = isBuilding;
+
 
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
@@ -543,13 +671,118 @@ namespace SubwayMapRender {
             return true;
         }
 
-        static bool LayoutProcessor(string command, List<DataStruct.RailLayoutItem> obj) {
+        static bool LayoutProcessor(string command, List<DataStruct.StationLayoutItem> obj) {
             if (command == "") return true;
 
             var sp = CommandSplitter.SplitCommand(command);
             var main = sp[0];
             sp.RemoveAt(0);
             switch (main) {
+                case "ls":
+                    if (sp.Count == 0) {
+                        OutputHelper.OutputLayoutList(obj);
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "new":
+                    if (sp.Count == 0) obj.Add(new DataStruct.StationLayoutItem());
+                    else if (sp.Count == 1) {
+                        //check param
+                        int index;
+                        try {
+                            index = int.Parse(sp[0]);
+                        } catch (Exception) {
+                            ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        if (index < 0 || index > obj.Count) {
+                            ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        obj.Insert(index, new DataStruct.StationLayoutItem());
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "rm":
+                    if (sp.Count == 1) {
+                        //check param
+                        int index;
+                        try {
+                            index = int.Parse(sp[0]);
+                        } catch (Exception) {
+                            ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        if (index < 0 || index >= obj.Count) {
+                            ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        obj.RemoveAt(index);
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "mv":
+                    if (sp.Count == 2) {
+                        //check param
+                        int index, newI;
+                        try {
+                            index = int.Parse(sp[0]);
+                            newI = int.Parse(sp[1]);
+                        } catch (Exception) {
+                            ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        if ((index < 0 || index >= obj.Count) || (newI < 0 || newI > obj.Count - 1)) {
+                            ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        var cache = obj[index];
+                        obj.RemoveAt(index);
+                        obj.Insert(newI, cache);
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
+                case "edit":
+                    if (sp.Count == 1) {
+                        //check param
+                        int index;
+                        string[] spData;
+                        try {
+                            index = int.Parse(sp[0]);
+                            spData = sp[1].Split(",");
+                        } catch (Exception) {
+                            ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        if (index < 0 || index >= obj.Count) {
+                            ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        //detect metadata
+                        foreach (var item in spData) {
+                            if (!railLayoutRegex.IsMatch(item)) {
+                                ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                                return true;
+                            }
+                        }
+
+                        obj[index].RailLayoutList.Clear();
+                        foreach(var item in spData) {
+                            obj[index].RailLayoutList.Add(new DataStruct.RailLayoutItem() {
+                                RailColor = DataStruct.Converter.HexStringToColor(item.Substring(1, 7)),
+                                Toward = DataStruct.Converter.StringToToward(item[0])
+                            });
+                        }
+                        
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
                 case "back":
                     return false;
                 case "help":
@@ -594,8 +827,8 @@ namespace SubwayMapRender {
             Console.WriteLine("\tnew [id] - create a new station");
             Console.WriteLine("\trm [id] - remove a station");
             Console.WriteLine("\tre [id] [new-id] - rename a station");
-            Console.WriteLine("\tedit [id] [name] [is-building] - set specific station's data");
-            Console.WriteLine("\tbuilder sel - invoke builder editor");
+            Console.WriteLine("\tedit [id] [name] [is-building] [render-direction] [render-offset] - set specific station's data");
+            Console.WriteLine("\tbuilder [id] - invoke builder editor");
             Console.WriteLine("\tlayout [id] - invoke layout editor");
             Console.WriteLine("\tback - back to main editor");
 
