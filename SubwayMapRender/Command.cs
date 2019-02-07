@@ -8,7 +8,7 @@ namespace SubwayMapRender {
     public static class Command {
 
         static Regex hexColorRegex = new Regex("#[0123456789abcdefABCDEF]{6}");
-        static Regex railLayoutRegex = new Regex("[NUDLRuudlr]{1}#[0123456789abcdefABCDEF]{6}");
+        static Regex railLayoutRegex = new Regex("[NUDLRnudlr]{1}#(\\S|\\s)*");
 
         /// <summary>
         /// Command processor
@@ -25,7 +25,7 @@ namespace SubwayMapRender {
             switch (main) {
                 case "name":
                     if (sp.Count == 0) {
-                        ConsoleAssistance.Write("Current subway map name: ");
+                        ConsoleAssistance.Write("Current subway map name: ", ConsoleColor.Yellow);
                         Console.WriteLine(obj.Name);
                     } else if (sp.Count == 1) obj.Name = sp[0];
                     else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
@@ -48,6 +48,7 @@ namespace SubwayMapRender {
                     break;
                 //normal command
                 case "render":
+                    Render.RenderKernel(obj);
                     break;
                 case "save":
                     ConfigManager.Write(obj);
@@ -804,13 +805,13 @@ namespace SubwayMapRender {
                         }
 
                         obj[index].RailLayoutList.Clear();
-                        foreach(var item in spData) {
+                        foreach (var item in spData) {
                             obj[index].RailLayoutList.Add(new DataStruct.RailLayoutItem() {
-                                RailColor = DataStruct.Converter.HexStringToColor(item.Substring(1, 7)),
-                                Toward = DataStruct.Converter.StringToToward(item[0])
+                                Toward = DataStruct.Converter.StringToToward(item[0]),
+                                AttachLine = item.Length <= 2 ? "" : item.Substring(2, item.Length - 2)
                             });
                         }
-                        
+
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "back":

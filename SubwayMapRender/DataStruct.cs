@@ -165,10 +165,11 @@ namespace SubwayMapRender.DataStruct {
 
     public class RailLayoutItem {
         public RailLayoutItem() {
-            RailColor = new Color(0, 0, 0);
+            AttachLine = "";
             Toward = RailToward.None;
         }
-        public Color RailColor { get; set; }
+        //set black for platform
+        public string AttachLine { get; set; }
         public RailToward Toward { get; set; }
     }
 

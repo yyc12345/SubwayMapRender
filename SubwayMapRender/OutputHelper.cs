@@ -47,13 +47,7 @@ namespace SubwayMapRender {
             ConsoleAssistance.WriteLine("Builder list: ", ConsoleColor.Yellow);
             OutputBuilderList(data.Builder);
             ConsoleAssistance.WriteLine("Layout list: ", ConsoleColor.Yellow);
-            
-            Console.WriteLine("Index\tFloor\tIs horizon layout\tRail count");
-            int index = 0;
-            foreach (var item in data.StationLayoutList) {
-                Console.WriteLine($"{index}\t{item.Floor}\t{item.IsHorizonStationLayout}\t{item.RailLayoutList.Count}");
-                index++;
-            }
+            OutputLayoutList(data.StationLayoutList);
         }
 
         public static void OutputNodeList(List<DataStruct.LineNodeItem> obj) {
@@ -85,11 +79,60 @@ namespace SubwayMapRender {
         }
 
         public static void OutputLayoutList(List<DataStruct.StationLayoutItem> data) {
-            Console.WriteLine("Index\tFloor\tIs horizon layout\tRail count");
             int index = 0;
             foreach (var item in data) {
-                Console.WriteLine($"{index}\t{item.Floor}\t{item.IsHorizonStationLayout}\t{item.RailLayoutList.Count}");
+                Console.WriteLine("----------------------------");
+                ConsoleAssistance.Write("Index: ", ConsoleColor.Yellow);
+                Console.WriteLine(index);
+                ConsoleAssistance.Write("Floor: ", ConsoleColor.Yellow);
+                Console.WriteLine(item.Floor);
+                ConsoleAssistance.WriteLine("Rail layout: ", ConsoleColor.Yellow);
+
+                if (item.RailLayoutList.Count != 0) {
+                    string[] rails = new string[item.RailLayoutList.Count];
+                    int innerindex = 0;
+                    int max = 0;
+                    foreach (var inner in item.RailLayoutList) {
+                        rails[innerindex] = OutputToward(inner.Toward) + inner.AttachLine;
+                        if (rails[innerindex].Length > max) max = rails[innerindex].Length;
+                        innerindex++;
+                    }
+                    
+                    if (item.IsHorizonStationLayout) {
+                        foreach (var inner in rails) {
+                            Console.WriteLine(inner);
+                        }
+                    } else {
+                        string cache = "";
+                        for (int i = 0; i < max; i++) {
+                            foreach (var getter in rails) {
+                                if (getter.Length > i) cache += getter[i];
+                                else cache += " ";
+                            }
+                            Console.WriteLine(cache);
+                            cache = "";
+                        }
+                    }
+                }
+
                 index++;
+            }
+        }
+
+        static string OutputToward(DataStruct.RailToward toward) {
+            switch (toward) {
+                case DataStruct.RailToward.None:
+                    return "█████";
+                case DataStruct.RailToward.Up:
+                    return "↑↑↑↑↑";
+                case DataStruct.RailToward.Down:
+                    return "↓↓↓↓↓";
+                case DataStruct.RailToward.Left:
+                    return "←←←←←";
+                case DataStruct.RailToward.Right:
+                    return "→→→→→";
+                default:
+                    return "█████";
             }
         }
 
