@@ -138,6 +138,8 @@ namespace SubwayMapRender.DataStruct {
         public StationItem() {
             StationId = "";
             StationName = "";
+            StationSubtitle = "";
+            StationDescription = "";
             RenderDirection = 0;
             RenderOffset = 10;
             Builder = new List<BuilderItem>();
@@ -145,6 +147,8 @@ namespace SubwayMapRender.DataStruct {
         }
         public string StationId { get; set; }
         public string StationName { get; set; }
+        public string StationSubtitle { get; set; }
+        public string StationDescription { get; set; }
         public bool IsBuilding { get; set; }
         public int RenderDirection { get; set; }
         public int RenderOffset { get; set; }

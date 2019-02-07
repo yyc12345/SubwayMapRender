@@ -25,9 +25,9 @@ namespace SubwayMapRender {
         }
 
         public static void OutputStationList(List<DataStruct.StationItem> obj) {
-            var table = new ConsoleTable("Id", "Name", "Is building?", "Render direction", "Render Offset", "Builder count", "Layout count");
+            var table = new ConsoleTable("Id", "Name", "Subtitle", "Is building?", "Render direction", "Render Offset", "Builder count", "Layout count", "Description");
             foreach (var item in obj) {
-                table.AddRow(item.StationId, item.StationName, item.IsBuilding.ToString(), item.RenderDirection.ToString(), item.RenderOffset.ToString(), item.Builder.Count.ToString(), item.StationLayoutList.Count.ToString());
+                table.AddRow(item.StationId, item.StationName, item.StationSubtitle, item.IsBuilding.ToString(), item.RenderDirection.ToString(), item.RenderOffset.ToString(), item.Builder.Count.ToString(), item.StationLayoutList.Count.ToString(), item.StationDescription);
             }
             Console.Write(table.ToStringAlternative());
             Console.WriteLine();
@@ -38,12 +38,16 @@ namespace SubwayMapRender {
             Console.WriteLine(data.StationId);
             ConsoleAssistance.Write("Station name: ", ConsoleColor.Yellow);
             Console.WriteLine(data.StationName);
+            ConsoleAssistance.Write("Station subtitle: ", ConsoleColor.Yellow);
+            Console.WriteLine(data.StationSubtitle);
             ConsoleAssistance.Write("Is building: ", ConsoleColor.Yellow);
             Console.WriteLine(data.IsBuilding);
             ConsoleAssistance.Write("Render direction: ", ConsoleColor.Yellow);
             Console.WriteLine(data.RenderDirection);
             ConsoleAssistance.Write("Render offset: ", ConsoleColor.Yellow);
             Console.WriteLine(data.RenderOffset);
+            ConsoleAssistance.Write("Station description: ", ConsoleColor.Yellow);
+            Console.WriteLine(data.StationDescription);
             ConsoleAssistance.WriteLine("Builder list: ", ConsoleColor.Yellow);
             OutputBuilderList(data.Builder);
             ConsoleAssistance.WriteLine("Layout list: ", ConsoleColor.Yellow);
@@ -97,7 +101,7 @@ namespace SubwayMapRender {
                         if (rails[innerindex].Length > max) max = rails[innerindex].Length;
                         innerindex++;
                     }
-                    
+
                     if (item.IsHorizonStationLayout) {
                         foreach (var inner in rails) {
                             Console.WriteLine(inner);

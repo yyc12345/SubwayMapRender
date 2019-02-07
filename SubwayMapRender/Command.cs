@@ -397,7 +397,7 @@ namespace SubwayMapRender {
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "edit":
-                    if (sp.Count == 5) {
+                    if (sp.Count == 7) {
                         //search
                         var search = from item in obj
                                      where item.StationId == sp[0]
@@ -411,9 +411,9 @@ namespace SubwayMapRender {
                         bool isBuilding = false;
                         int renderDirection = 0, renderOffset = 0;
                         try {
-                            if (sp[2] != "~") isBuilding = bool.Parse(sp[2]);
-                            if (sp[3] != "~") renderDirection = int.Parse(sp[3]);
-                            if (sp[4] != "~") renderOffset = int.Parse(sp[4]);
+                            if (sp[3] != "~") isBuilding = bool.Parse(sp[3]);
+                            if (sp[4] != "~") renderDirection = int.Parse(sp[4]);
+                            if (sp[5] != "~") renderOffset = int.Parse(sp[5]);
                         } catch (Exception) {
                             ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
                             return true;
@@ -421,9 +421,11 @@ namespace SubwayMapRender {
 
                         var cache = search.First();
                         if (sp[1] != "~") cache.StationName = sp[1];
-                        if (sp[2] != "~") cache.IsBuilding = isBuilding;
-                        if (sp[3] != "~") cache.RenderDirection = renderDirection;
-                        if (sp[4] != "~") cache.RenderOffset = renderOffset;
+                        if (sp[2] != "~") cache.StationSubtitle = sp[2];
+                        if (sp[3] != "~") cache.IsBuilding = isBuilding;
+                        if (sp[4] != "~") cache.RenderDirection = renderDirection;
+                        if (sp[5] != "~") cache.RenderOffset = renderOffset;
+                        if (sp[6] != "~") cache.StationDescription = sp[6];
 
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
@@ -617,7 +619,7 @@ namespace SubwayMapRender {
                             index = int.Parse(sp[0]);
                             if (sp[1] != "~")
                                 railWidth = int.Parse(sp[1]);
-                            if (sp[1] != "~")
+                            if (sp[2] != "~")
                                 isBuilding = bool.Parse(sp[2]);
                         } catch (Exception) {
                             ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
@@ -859,7 +861,7 @@ namespace SubwayMapRender {
             Console.WriteLine("\tnew [id] - create a new station");
             Console.WriteLine("\trm [id] - remove a station");
             Console.WriteLine("\tre [id] [new-id] - rename a station");
-            Console.WriteLine("\tedit [id] [name] [is-building] [render-direction] [render-offset] - set specific station's data");
+            Console.WriteLine("\tedit [id] [name] [subtitle] [is-building] [render-direction] [render-offset] [description] - set specific station's data");
             Console.WriteLine("\tbuilder [id] - invoke builder editor");
             Console.WriteLine("\tlayout [id] - invoke layout editor");
             Console.WriteLine("\tback - back to main editor");
