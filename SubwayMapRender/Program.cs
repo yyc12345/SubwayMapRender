@@ -15,7 +15,7 @@ namespace SubwayMapRender
             string command = "";
             while (true) {
                 ConsoleAssistance.Write("> ", ConsoleColor.Green);
-                command = Console.ReadLine();
+                command = ConsoleAssistance.ReadLine();
                 if (!Command.CommandProcessor(command, globalConfig)) break;
             }
 

@@ -31,30 +31,48 @@ namespace SubwayMapRender {
                     else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "line":
-                    var innerCommand = "";
-                    while (true) {
-                        ConsoleAssistance.Write("Line editor> ", ConsoleColor.Green);
-                        innerCommand = Console.ReadLine();
-                        if (!LineProcessor(innerCommand, obj.LineList)) break;
-                    }
+                    if (sp.Count == 0) {
+                        var innerCommand = "";
+                        while (true) {
+                            ConsoleAssistance.Write("Line editor> ", ConsoleColor.Green);
+                            innerCommand = ConsoleAssistance.ReadLine();
+                            if (!LineProcessor(innerCommand, obj.LineList)) break;
+                        }
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "station":
-                    var innerCommand2 = "";
-                    while (true) {
-                        ConsoleAssistance.Write("Station editor> ", ConsoleColor.Green);
-                        innerCommand2 = Console.ReadLine();
-                        if (!StationProcessor(innerCommand2, obj.StationList)) break;
-                    }
+                    if (sp.Count == 0) {
+                        var innerCommand2 = "";
+                        while (true) {
+                            ConsoleAssistance.Write("Station editor> ", ConsoleColor.Green);
+                            innerCommand2 = ConsoleAssistance.ReadLine();
+                            if (!StationProcessor(innerCommand2, obj.StationList)) break;
+                        }
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 //normal command
                 case "render":
                     Render.RenderKernel(obj);
                     break;
+                case "import":
+                    if (sp.Count == 1) {
+                        ConsoleAssistance.WriteLine("import is a dangerous command. It will load all script and run it without any error judgement! It couldn't be stopped before all of commands has been executed!", ConsoleColor.Yellow);
+                        var confirm = new Random().Next(100, 9999);
+                        ConsoleAssistance.WriteLine($"Type this random number to confirm your operation: {confirm}", ConsoleColor.Yellow);
+                        if (Console.ReadLine() == confirm.ToString()) {
+                            if (System.IO.File.Exists(sp[0])) ConsoleAssistance.AppendImportedCommands(sp[0]);
+                            else ConsoleAssistance.WriteLine("Cannot find specific file", ConsoleColor.Red);
+                        }
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
                 case "save":
                     ConfigManager.Write(obj);
                     break;
                 case "exit":
-                    return false;
+                    ConsoleAssistance.WriteLine("Are you sure that you want to exit? exit command couldn't save your work automatically! Please use save command in advance.", ConsoleColor.Yellow);
+                    var confirm2 = new Random().Next(100, 9999);
+                    ConsoleAssistance.WriteLine($"Type this random number to confirm your operation: {confirm2}", ConsoleColor.Yellow);
+                    return (Console.ReadLine() != confirm2.ToString());
                 case "help":
                     Help();
                     break;
@@ -294,7 +312,7 @@ namespace SubwayMapRender {
                         var innerCommand = "";
                         while (true) {
                             ConsoleAssistance.Write($"Node editor ({inputObj.LineName})> ", ConsoleColor.Green);
-                            innerCommand = Console.ReadLine();
+                            innerCommand = ConsoleAssistance.ReadLine();
                             if (!NodeProcessor(innerCommand, inputObj.NodeList, inputObj.LineName)) break;
                         }
 
@@ -444,7 +462,7 @@ namespace SubwayMapRender {
                         var innerCommand = "";
                         while (true) {
                             ConsoleAssistance.Write($"Builder editor ({inputObj.StationId} - {inputObj.StationName})> ", ConsoleColor.Green);
-                            innerCommand = Console.ReadLine();
+                            innerCommand = ConsoleAssistance.ReadLine();
                             if (!BuilderProcessor(innerCommand, inputObj.Builder)) break;
                         }
 
@@ -465,7 +483,7 @@ namespace SubwayMapRender {
                         var innerCommand = "";
                         while (true) {
                             ConsoleAssistance.Write($"Layout editor ({inputObj.StationId} - {inputObj.StationName})> ", ConsoleColor.Green);
-                            innerCommand = Console.ReadLine();
+                            innerCommand = ConsoleAssistance.ReadLine();
                             if (!LayoutProcessor(innerCommand, inputObj.StationLayoutList)) break;
                         }
 
@@ -659,7 +677,7 @@ namespace SubwayMapRender {
                         var innerCommand = "";
                         while (true) {
                             ConsoleAssistance.Write($"Builder editor ({workSpaceDesc} Node:{index})> ", ConsoleColor.Green);
-                            innerCommand = Console.ReadLine();
+                            innerCommand = ConsoleAssistance.ReadLine();
                             if (!BuilderProcessor(innerCommand, inputObj.FollowingBuilder)) break;
                         }
 
@@ -835,6 +853,7 @@ namespace SubwayMapRender {
             Console.WriteLine("General commands:");
             Console.WriteLine("\trender - render your work and output with website formation");
             Console.WriteLine("\tsave - save current work");
+            Console.WriteLine("\timport [file] - import a script file and run it immediately");
             Console.WriteLine("\texit - exit app");
             Console.WriteLine("\thelp - print this message");
             Console.WriteLine("");
