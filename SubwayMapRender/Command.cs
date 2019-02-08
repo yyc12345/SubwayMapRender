@@ -20,6 +20,10 @@ namespace SubwayMapRender {
             if (command == "") return true;
 
             var sp = CommandSplitter.SplitCommand(command);
+            if (sp.Count == 0) {
+                ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                return true;
+            }
             var main = sp[0];
             sp.RemoveAt(0);
             switch (main) {
@@ -88,6 +92,10 @@ namespace SubwayMapRender {
             if (command == "") return true;
 
             var sp = CommandSplitter.SplitCommand(command);
+            if (sp.Count == 0) {
+                ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                return true;
+            }
             var main = sp[0];
             sp.RemoveAt(0);
             switch (main) {
@@ -197,6 +205,10 @@ namespace SubwayMapRender {
             if (command == "") return true;
 
             var sp = CommandSplitter.SplitCommand(command);
+            if (sp.Count == 0) {
+                ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                return true;
+            }
             var main = sp[0];
             sp.RemoveAt(0);
             switch (main) {
@@ -335,6 +347,10 @@ namespace SubwayMapRender {
             if (command == "") return true;
 
             var sp = CommandSplitter.SplitCommand(command);
+            if (sp.Count == 0) {
+                ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                return true;
+            }
             var main = sp[0];
             sp.RemoveAt(0);
             switch (main) {
@@ -506,6 +522,10 @@ namespace SubwayMapRender {
             if (command == "") return true;
 
             var sp = CommandSplitter.SplitCommand(command);
+            if (sp.Count == 0) {
+                ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                return true;
+            }
             var main = sp[0];
             sp.RemoveAt(0);
             switch (main) {
@@ -700,6 +720,10 @@ namespace SubwayMapRender {
             if (command == "") return true;
 
             var sp = CommandSplitter.SplitCommand(command);
+            if (sp.Count == 0) {
+                ConsoleAssistance.WriteLine("Illegal parameter", ConsoleColor.Red);
+                return true;
+            }
             var main = sp[0];
             sp.RemoveAt(0);
             switch (main) {
