@@ -67,7 +67,11 @@ namespace SubwayMapRender {
             //write svg size
             fsHtml.WriteLine($"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" style=\"flex: 1;\"><g id=\"uiSvgRoot\">");
 
-            //output line
+            //output line and matched js
+            //write js head
+            fsJs.WriteLine("function generatedCodeShowLine(name) {");
+            fsJs.WriteLine("switch(name) {");
+
             int x = 0, y = 0, _x = 0, _y = 0;
             foreach (var line in map.LineList) {
                 if (line.NodeList.Count > 1) {
@@ -75,10 +79,21 @@ namespace SubwayMapRender {
                     for (int i = 0; i < line.NodeList.Count - 1; i++) {
                         CoordinateConverter(line.NodeList[i].NodePosition.X, line.NodeList[i].NodePosition.Z, negX, negZ, ref x, ref y);
                         CoordinateConverter(line.NodeList[i + 1].NodePosition.X, line.NodeList[i + 1].NodePosition.Z, negX, negZ, ref _x, ref _y);
-                        fsHtml.WriteLine($"<line x1=\"{x}\" y1=\"{y}\" x2=\"{_x}\" y2=\"{_y}\" class=\"smr-svg-line smr-svg-line--{_lineName}{(line.NodeList[i].FollowingRailIsBuilding ? " smr-svg-line-building" : "")}\"/>");
+                        //write html
+                        fsHtml.WriteLine($"<line onclick=\"showWindowLine('{_lineName}-{i}')\" x1=\"{x}\" y1=\"{y}\" x2=\"{_x}\" y2=\"{_y}\" class=\"smr-display-line smr-display-line--{_lineName} smr-svg-line smr-svg-line--{_lineName}{(line.NodeList[i].FollowingRailIsBuilding ? " smr-svg-line-building" : "")}\"/>");
+                        //write js
+                        fsJs.WriteLine($"case '{_lineName}-{i}':");
+                        fsJs.WriteLine($"setWindowLine('{line.LineColor.ToString()}', '{line.LineName}');");
+                        foreach (var builders in line.NodeList[i].FollowingBuilder) {
+                            fsJs.WriteLine($"addWindowLineBuider('{builders.Segment}', '{builders.Builder}');");
+                        }
+                        fsJs.WriteLine("break;");
                     }
                 }
             }
+
+            //write js foot
+            fsJs.WriteLine("}}");
 
             fsHtml.WriteLine($"</g></svg>");
 
@@ -86,7 +101,8 @@ namespace SubwayMapRender {
             CopyLimitedLine(53 - 44 - 1, readerHtml, fsHtml);
             readerHtml.ReadLine();
             foreach (var line in map.LineList) {
-                fsHtml.WriteLine("<button class=\"mui-btn mui-btn--raised mui-btn--primary\">");
+                string _lineName = line.LineName.Replace(" ", "-");
+                fsHtml.WriteLine($"<button onclick=\"setDisplay('{_lineName}');\" class=\"mui-btn mui-btn--raised mui-btn--primary\">");
                 fsHtml.WriteLine($"<p><font color=\"{line.LineColor.ToString()}\">█▌</font> {line.LineName}</p>");
                 fsHtml.WriteLine("</button>");
             }

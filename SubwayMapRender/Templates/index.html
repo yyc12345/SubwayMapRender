@@ -19,7 +19,7 @@
     <script src="https://cdn.muicss.com/mui-0.9.41/js/mui.min.js"></script>
     <script src="index.js"></script>
     <!-- load generated code-->
-    <link rel="stylesheet" type="text/css" href="generate.css"/>
+    <link rel="stylesheet" type="text/css" href="generate.css" />
     <script src="generate.js"></script>
 </head>
 
@@ -46,7 +46,7 @@
         <div id="uiWindowDisplay" class="mui-panel" style="position: fixed;right: 10px;left: 10px;bottom: 10px;top: 80px;max-width: 300px;overflow-x: auto;overflow-y: auto;display: none;">
             <button onclick="closeWindow('uiWindowDisplay');" class="mui-btn" title="Close this window" style="float: left;">X</button>
             <br />
-            <button class="mui-btn mui-btn--raised">Restore Display Settings</button>
+            <button onclick="restoreDisplay(true);" class="mui-btn mui-btn--raised">Restore Display Settings</button>
             <br />
             <div class="mui--text-display5">Click specific button to display matched line</div>
             <br />
@@ -59,7 +59,7 @@
             <br />
             <br />
             <p><b>Line info: </b>
-                <font color="#ff0000">█▌</font> {line}
+                <font id="uiWindowLine-color" color="#ff0000">█▌</font><font id="uiWindowLine-name">{line}</font>
             </p>
             <br />
             <p><b>Builder info:</b></p>
@@ -70,21 +70,13 @@
                         <th>Buider</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>Cell 1-1</td>
-                        <td>Cell 1-2</td>
-                    </tr>
-                    <tr>
-                        <td>Cell 2-1</td>
-                        <td>Cell 2-2</td>
-                    </tr>
+                <tbody id="uiWindowLine-builder">
                 </tbody>
             </table>
         </div>
 
         <!-- station window-->
-        <div id="uiWindowStation" class="mui-panel" style="text-align: left !important;position: fixed;right: 10px;left: 10px;bottom: 10px;top: 80px;max-width: 300px;overflow-x: auto;overflow-y: auto;">
+        <div id="uiWindowStation" class="mui-panel" style="text-align: left !important;position: fixed;right: 10px;left: 10px;bottom: 10px;top: 80px;max-width: 300px;overflow-x: auto;overflow-y: auto;display: none;">
             <button onclick="closeWindow('uiWindowStation');" class="mui-btn" title="Close this window">X</button>
             <br />
             <br />
@@ -94,35 +86,69 @@
             <p><b>Station ID: </b> {stationId}</p>
             <p><b>Station description: </b></p>
             <p style="word-wrap:break-word;height: auto;word-break:break-all;overflow: hidden;">looooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong</p>
+
+            <br />
+            <div class="mui-divider"></div>
+            <br />
             <p style="font-size: 16px;"><b>Teleport command: </b></p>
             <code style="border: 1px solid black;padding: 5px;border-radius: 5px;">/tp yyc12345 616 6161 61616</code>
             <br />
             <br />
+            <div class="mui-divider"></div>
+            <br />
             <p style="font-size: 16px;"><b>Station layout:</b></p>
             <br />
-            <p style="text-align: center;"><b>Example floor</b></p>
-            <div style="text-align: center;">
-                <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" style="flex: 1;">
-                    <g>
-                        <title>Line 1</title>
-                        <rect x="0" y="0" width="200" height="20" style="fill:red;stroke-width: 0;" />
-                        <line x1="10" y1="9" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
-                        <line x1="180" y1="5" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
-                        <line x1="180" y1="13" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
-                    </g>
-                    <g>
-                        <title>Platform</title>
-                        <rect x="0" y="20" width="200" height="20" style="fill:#dfdfdf;stroke-width: 0;" />
-                    </g>
-                    <g>
-                        <title>Line 1</title>
-                        <rect x="0" y="40" width="200" height="20" style="fill:red;stroke-width: 0;" />
-                        <line x1="10" y1="49" x2="190" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
-                        <line x1="20" y1="45" x2="10" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
-                        <line x1="20" y1="53" x2="10" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
-                    </g>
-                </svg>
+            <div>
+                <p style="text-align: center;"><b>Example floor</b></p>
+                <div style="text-align: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" style="flex: 1;">
+                        <g>
+                            <title>Line 1</title>
+                            <rect x="0" y="0" width="200" height="20" style="fill:red;stroke-width: 0;" />
+                            <line x1="10" y1="9" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                            <line x1="180" y1="5" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                            <line x1="180" y1="13" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                        </g>
+                        <g>
+                            <title>Platform</title>
+                            <rect x="0" y="20" width="200" height="20" style="fill:#dfdfdf;stroke-width: 0;" />
+                        </g>
+                        <g>
+                            <title>Line 1</title>
+                            <rect x="0" y="40" width="200" height="20" style="fill:red;stroke-width: 0;" />
+                            <line x1="10" y1="49" x2="190" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                            <line x1="20" y1="45" x2="10" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                            <line x1="20" y1="53" x2="10" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                        </g>
+                    </svg>
+                </div>
+                <p style="text-align: center;"><b>Example floor</b></p>
+                <div style="text-align: center;">
+                    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="100" style="flex: 1;">
+                        <g>
+                            <title>Line 1</title>
+                            <rect x="0" y="0" width="200" height="20" style="fill:red;stroke-width: 0;" />
+                            <line x1="10" y1="9" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                            <line x1="180" y1="5" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                            <line x1="180" y1="13" x2="190" y2="9" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                        </g>
+                        <g>
+                            <title>Platform</title>
+                            <rect x="0" y="20" width="200" height="20" style="fill:#dfdfdf;stroke-width: 0;" />
+                        </g>
+                        <g>
+                            <title>Line 1</title>
+                            <rect x="0" y="40" width="200" height="20" style="fill:red;stroke-width: 0;" />
+                            <line x1="10" y1="49" x2="190" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                            <line x1="20" y1="45" x2="10" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                            <line x1="20" y1="53" x2="10" y2="49" style="stroke: white;stroke-width: 3px;stroke-linecap: round;" />
+                        </g>
+                    </svg>
+                </div>
             </div>
+
+            <br />
+            <div class="mui-divider"></div>
             <br />
             <p style="font-size: 16px;"><b>Builder info:</b></p>
             <table class="mui-table">
