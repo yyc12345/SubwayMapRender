@@ -8,7 +8,7 @@ namespace SubwayMapRender {
     public static class Command {
 
         static Regex hexColorRegex = new Regex("#[0123456789abcdefABCDEF]{6}");
-        static Regex railLayoutRegex = new Regex("[NUDLRnudlr]{1}#(\\S|\\s)*");
+        static Regex railLayoutRegex = new Regex("[PVUDLRpvudlr]{1}#(\\S|\\s)*");
 
         /// <summary>
         /// Command processor

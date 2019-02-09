@@ -125,7 +125,9 @@ namespace SubwayMapRender {
 
         static string OutputToward(DataStruct.RailToward toward) {
             switch (toward) {
-                case DataStruct.RailToward.None:
+                case DataStruct.RailToward.Void:
+                    return "XXXXX";
+                case DataStruct.RailToward.Platform:
                     return "█████";
                 case DataStruct.RailToward.Up:
                     return "↑↑↑↑↑";
@@ -136,7 +138,7 @@ namespace SubwayMapRender {
                 case DataStruct.RailToward.Right:
                     return "→→→→→";
                 default:
-                    return "█████";
+                    return "XXXXX";
             }
         }
 

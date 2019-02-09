@@ -17,33 +17,37 @@ namespace SubwayMapRender {
             if (!Directory.Exists("output"))
                 Directory.CreateDirectory("output");
 
+            //copy necessary file
+            File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "index.html"), Path.Combine(Environment.CurrentDirectory, "output", "index.html"), true);
+            File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "index.css"), Path.Combine(Environment.CurrentDirectory, "output", "index.css"), true);
+            File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "index.js"), Path.Combine(Environment.CurrentDirectory, "output", "index.js"), true);
+            File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "mui.css"), Path.Combine(Environment.CurrentDirectory, "output", "mui.css"), true);
+
             //output file
-            var fsHtml = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "index.html"), false, Encoding.UTF8);
-            var fsCss = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "index.css"), false, Encoding.UTF8);
-            //var fsJs = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "index.js"), false, Encoding.UTF8);
+            /*
+            Line 6 <title>{title}</title>
+            Line 31 <td class="mui--text-title">{title}</td>
+            Line 44 output svg: <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" style="flex: 1;">
+            Line 53 output line list (with button style)
+            */
+            var readerHtml = new StreamReader(Path.Combine(Environment.CurrentDirectory, "output", "index.html"), Encoding.UTF8);
+            var fsHtml = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "generate.html"), false, Encoding.UTF8);
+            var fsCss = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "generate.css"), false, Encoding.UTF8);
+            var fsJs = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "generate.js"), false, Encoding.UTF8);
 
-            //write css for line and station's style
-            fsCss.WriteLine(".render-line {");
-            fsCss.WriteLine("stroke-width: 5px;");
-            fsCss.WriteLine("stroke-linecap: round;");
-            fsCss.WriteLine("}");
+            //write title 1================================================================================
+            CopyLimitedLine(5, readerHtml, fsHtml);
+            readerHtml.ReadLine();
+            fsHtml.WriteLine($"<title>{map.Name}</title>");
 
-            fsCss.WriteLine(".render-line-building {");
-            fsCss.WriteLine("stroke-dasharray: 10,10;");
-            fsCss.WriteLine("}");
+            //write title 2================================================================================
+            CopyLimitedLine(31 - 6 - 1, readerHtml, fsHtml);
+            readerHtml.ReadLine();
+            fsHtml.WriteLine($"<td class=\"mui--text-title\">{map.Name}</td>");
 
-            fsCss.WriteLine(".render-station {");
-            fsCss.WriteLine("fill: #7f7f7f;");
-            fsCss.WriteLine("stroke: #7f7f7f;");
-            fsCss.WriteLine("}");
-
-            fsCss.WriteLine(".render-station-building {");
-            fsCss.WriteLine("fill: #dfdfdf;");
-            fsCss.WriteLine("stroke: #dfdfdf;");
-            fsCss.WriteLine("}");
-
-            //write html head
-            fsHtml.Write("<!DOCTYPE html><html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"index.css\"></head><body>");
+            //write svg body================================================================================
+            CopyLimitedLine(44 - 31 - 1, readerHtml, fsHtml);
+            readerHtml.ReadLine();
 
             //calc map size and write css at the same time
             int negX = int.MaxValue, negZ = int.MaxValue, posX = int.MinValue, posZ = int.MinValue;
@@ -61,7 +65,7 @@ namespace SubwayMapRender {
             int height = posZ - negZ;
 
             //write svg size
-            fsHtml.Write($"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"{width}\" height=\"{height}\"><g id=\"root\">");
+            fsHtml.WriteLine($"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" style=\"flex: 1;\"><g id=\"uiSvgRoot\">");
 
             //output line
             int x = 0, y = 0, _x = 0, _y = 0;
@@ -71,23 +75,57 @@ namespace SubwayMapRender {
                     for (int i = 0; i < line.NodeList.Count - 1; i++) {
                         CoordinateConverter(line.NodeList[i].NodePosition.X, line.NodeList[i].NodePosition.Z, negX, negZ, ref x, ref y);
                         CoordinateConverter(line.NodeList[i + 1].NodePosition.X, line.NodeList[i + 1].NodePosition.Z, negX, negZ, ref _x, ref _y);
-                        fsHtml.Write($"<line x1=\"{x}\" y1=\"{y}\" x2=\"{_x}\" y2=\"{_y}\" class=\"render-line render-line--{_lineName}{(line.NodeList[i].FollowingRailIsBuilding ? " render-line-building" : "")}\"/>");
+                        fsHtml.WriteLine($"<line x1=\"{x}\" y1=\"{y}\" x2=\"{_x}\" y2=\"{_y}\" class=\"smr-svg-line smr-svg-line--{_lineName}{(line.NodeList[i].FollowingRailIsBuilding ? " smr-svg-line-building" : "")}\"/>");
                     }
                 }
             }
 
-            //write html foot
-            fsHtml.Write("</g></svg></body></html>");
+            fsHtml.WriteLine($"</g></svg>");
 
+            //write line btn body================================================================================
+            CopyLimitedLine(53 - 44 - 1, readerHtml, fsHtml);
+            readerHtml.ReadLine();
+            foreach (var line in map.LineList) {
+                fsHtml.WriteLine("<button class=\"mui-btn mui-btn--raised mui-btn--primary\">");
+                fsHtml.WriteLine($"<p><font color=\"{line.LineColor.ToString()}\">█▌</font> {line.LineName}</p>");
+                fsHtml.WriteLine("</button>");
+            }
+
+            //write html foot================================================================================
+            CopyToEnd(readerHtml, fsHtml);
+
+            readerHtml.Close();
+            readerHtml.Dispose();
             fsHtml.Close();
             fsHtml.Dispose();
             fsCss.Close();
             fsCss.Dispose();
+            fsJs.Close();
+            fsJs.Dispose();
+
+            //remove and rename
+            File.Delete(Path.Combine(Environment.CurrentDirectory, "output", "index.html"));
+            File.Move(Path.Combine(Environment.CurrentDirectory, "output", "generate.html"), Path.Combine(Environment.CurrentDirectory, "output", "index.html"));
+        }
+
+        static void CopyLimitedLine(int lineCount, StreamReader fsOri, StreamWriter fsTarget) {
+            for (int copied = 0; copied < lineCount; copied++) {
+                fsTarget.WriteLine(fsOri.ReadLine());
+            }
+        }
+
+        static void CopyToEnd(StreamReader fsOri, StreamWriter fsTarget) {
+            var str = "";
+            while (true) {
+                str = fsOri.ReadLine();
+                if (str is null) break;
+                fsTarget.WriteLine(str);
+            }
         }
 
         static bool CheckData(DataStruct.SubwayMap map) {
-            foreach(var line in map.LineList) {
-                foreach(var node in line.NodeList) {
+            foreach (var line in map.LineList) {
+                foreach (var node in line.NodeList) {
                     goto next;
                 }
             }
@@ -99,8 +137,11 @@ namespace SubwayMapRender {
 
         static void WriteLineColor(string lineName, DataStruct.Color col, StreamWriter fs) {
             lineName = lineName.Replace(" ", "-");
-            fs.Write($".render-line--{lineName} {{");
+            fs.WriteLine($".smr-svg-line--{lineName} {{");
             fs.WriteLine($"stroke: {col.ToString()};");
+            fs.WriteLine("}");
+            fs.WriteLine($".smr-window-layout--{lineName} {{");
+            fs.WriteLine($"fill: {col.ToString()};");
             fs.WriteLine("}");
         }
 

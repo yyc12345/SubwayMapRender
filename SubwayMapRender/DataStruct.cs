@@ -25,8 +25,10 @@ namespace SubwayMapRender.DataStruct {
         public static RailToward StringToToward(char chr) {
             if (chr >= 'A' && chr <= 'Z') chr = (char)(chr - 'A' + 'a');
             switch (chr) {
-                case 'n':
-                    return RailToward.None;
+                case 'p':
+                    return RailToward.Platform;
+                case 'v':
+                    return RailToward.Void;
                 case 'u':
                     return RailToward.Up;
                 case 'd':
@@ -36,7 +38,7 @@ namespace SubwayMapRender.DataStruct {
                 case 'r':
                     return RailToward.Right;
                 default:
-                    return RailToward.None;
+                    return RailToward.Void;
             }
         }
 
@@ -170,7 +172,7 @@ namespace SubwayMapRender.DataStruct {
     public class RailLayoutItem {
         public RailLayoutItem() {
             AttachLine = "";
-            Toward = RailToward.None;
+            Toward = RailToward.Void;
         }
         //set black for platform
         public string AttachLine { get; set; }
@@ -178,7 +180,8 @@ namespace SubwayMapRender.DataStruct {
     }
 
     public enum RailToward {
-        None,
+        Platform,
+        Void,
         Up,
         Down,
         Left,
