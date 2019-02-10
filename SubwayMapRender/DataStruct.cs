@@ -42,6 +42,18 @@ namespace SubwayMapRender.DataStruct {
             }
         }
 
+        public static char TowardToString(RailToward tw) {
+            return (char)(tw.ToString()[0] - 'A' + 'a');
+        }
+
+        public static string RailLayoutListToString(List<RailLayoutItem> list) {
+            string[] strl = new string[list.Count];
+            for(int i = 0; i < list.Count; i++) {
+                strl[i] = TowardToString(list[i].Toward) + list[i].AttachLine;
+            }
+            return String.Join(',', strl);
+        }
+
         static int HexToDec(char chr) {
             if (chr >= 'a' && chr <= 'f') return 10 + chr - 'a';
             else return chr - '0';

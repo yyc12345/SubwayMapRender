@@ -67,6 +67,7 @@ namespace SubwayMapRender {
             //write svg size
             fsHtml.WriteLine($"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" style=\"flex: 1;\"><g id=\"uiSvgRoot\">");
 
+            //write line =================================
             //output line and matched js
             //write js head
             fsJs.WriteLine("function generatedCodeShowLine(name) {");
@@ -80,7 +81,7 @@ namespace SubwayMapRender {
                         CoordinateConverter(line.NodeList[i].NodePosition.X, line.NodeList[i].NodePosition.Z, negX, negZ, ref x, ref y);
                         CoordinateConverter(line.NodeList[i + 1].NodePosition.X, line.NodeList[i + 1].NodePosition.Z, negX, negZ, ref _x, ref _y);
                         //write html
-                        fsHtml.WriteLine($"<line onclick=\"showWindowLine('{_lineName}-{i}')\" x1=\"{x}\" y1=\"{y}\" x2=\"{_x}\" y2=\"{_y}\" class=\"smr-display-line smr-display-line--{_lineName} smr-svg-line smr-svg-line--{_lineName}{(line.NodeList[i].FollowingRailIsBuilding ? " smr-svg-line-building" : "")}\"/>");
+                        fsHtml.WriteLine($"<line onclick=\"showWindowLine('{_lineName}-{i}')\" x1=\"{x}\" y1=\"{y}\" x2=\"{_x}\" y2=\"{_y}\" class=\"smr-display-line smr-display--{_lineName} smr-svg-line smr-svg-line--{_lineName}{(line.NodeList[i].FollowingRailIsBuilding ? " smr-svg-line-building" : "")}\"/>");
                         //write js
                         fsJs.WriteLine($"case '{_lineName}-{i}':");
                         fsJs.WriteLine($"setWindowLine('{line.LineColor.ToString()}', '{line.LineName}');");
@@ -95,6 +96,56 @@ namespace SubwayMapRender {
             //write js foot
             fsJs.WriteLine("}}");
 
+
+            //write station ================================
+
+            //attach data dict
+            var attachStation = new Dictionary<string, string>();
+            foreach (var line in map.LineList) {
+                string _lineName = line.LineName.Replace(" ", "-");
+                foreach (var node in line.NodeList) {
+                    if (node.AttachedStationId != "") {
+                        if (attachStation.ContainsKey(node.AttachedStationId)) attachStation[node.AttachedStationId] += $" {_lineName}";
+                        else attachStation.Add(node.AttachedStationId, $" {_lineName}");
+                    }
+                }
+            }
+
+            //write js head
+            fsJs.WriteLine("");
+            fsJs.WriteLine("function generatedCodeShowStation(id) {");
+            fsJs.WriteLine("switch(id) {");
+
+            //write station point
+            string className = "";
+            foreach (var station in map.StationList) {
+                //write html
+                if (attachStation.ContainsKey(station.StationId)) className = attachStation[station.StationId];
+                else className = "";
+                fsHtml.WriteLine($"<g onclick=\"showWindowStation('{station.StationId}')\" class=\"smr-display-station{className}\">");
+
+                CoordinateConverter(station.Position.X, station.Position.Z, negX, negZ, ref x, ref y);
+                if (station.IsBuilding) fsHtml.WriteLine($"<circle cx=\"{x - 10}\" cy=\"{y - 10}\" r=\"10\" style=\"stroke: black; stroke-width; fill: gray;\"/>");
+                else fsHtml.WriteLine($"<circle cx=\"{x - 10}\" cy=\"{y - 10}\" r=\"10\" style=\"stroke: black; stroke-width; fill: white;\"/>");
+
+                fsHtml.WriteLine("</g>");
+
+                //write js
+                fsJs.WriteLine($"case '{station.StationId}':");
+                fsJs.WriteLine($"setWindowStation('{station.StationName}', '{station.StationSubtitle}', '{station.StationId}', '{station.StationDescription}', '{station.Position.X}', '{station.Position.Y}', '{station.Position.Z}');");
+                foreach (var builders in station.Builder) {
+                    fsJs.WriteLine($"addWindowStationBuider('{builders.Segment}', '{builders.Builder}');");
+                }
+                foreach (var layout in station.StationLayoutList) {
+                    fsJs.WriteLine($"addWindowStationLayout('{layout.Floor}', '{layout.IsHorizonStationLayout.ToString().ToLower()}', '{DataStruct.Converter.RailLayoutListToString(layout.RailLayoutList)}')");
+                }
+                fsJs.WriteLine("break;");
+            }
+
+            //write js foot
+            fsJs.WriteLine("}}");
+
+            //finish svg foot
             fsHtml.WriteLine($"</g></svg>");
 
             //write line btn body================================================================================
