@@ -49,7 +49,7 @@ function clearWindowLineBuilder() {
     $("#uiWindowLine-builder").html("");
 }
 
-function addWindowLineBuider(segment, builder) {
+function addWindowLineBuilder(segment, builder) {
     $("#uiWindowLine-builder").append("<tr><td>" + segment + "</td><td>" + builder + "</td></tr>");
 }
 
@@ -87,17 +87,18 @@ function addWindowStationLayout(floor, isHorizon, metadata) {
     //insert title
     $("#uiWindowStation-layout").append('<p style="text-align: center;">' + floor + '</p>');
     //insert svg
-    var insertedSvgCode = '<div style="text-align: center;"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="200" style="flex: 1;">';
-
     var sp = metadata.split(',');
-    var index = 0;
-    for (item in sp) {
+
+    var insertedSvgCode = "";
+    if (isHorizon) insertedSvgCode += '<div style="text-align: center;"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="' + (sp.length * 20) + '" style="flex: 1;">';
+    else insertedSvgCode += '<div style="text-align: center;"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="' + (sp.length * 20) + '" height="200" style="flex: 1;">';
+
+    for (var index = 0; index < sp.length; index++) {
         insertedSvgCode += '<g>';
         //0 is type, 1 is name
-        var inner = item.split('#');
+        var inner = sp[index].split('#');
         var type = inner[0];
         var name = inner[1];
-        var className = name.replace(' ', '-');
 
         switch (type) {
             case 'v':
@@ -112,7 +113,7 @@ function addWindowStationLayout(floor, isHorizon, metadata) {
                 break;
             case 'l':
                 insertedSvgCode += '<title>' + name + '</title>';
-                insertedSvgCode += '<rect x="0" y="' + (index * 20) + '" width="200" height="20" class="smr-window-layout smr-window-layout--' + className + '"/>';
+                insertedSvgCode += '<rect x="0" y="' + (index * 20) + '" width="200" height="20" class="smr-window-layout smr-window-layout--' + name.replace(' ', '-') + '"/>';
 
                 insertedSvgCode += '<line x1="10" y1="' + (index * 20 + 9) + '" x2="190" y2="' + (index * 20 + 9) + '" class="smr-window-layout-arrow"/>';
                 insertedSvgCode += '<line x1="10" y1="' + (index * 20 + 9) + '" x2="20" y2="' + (index * 20 + 5) + '" class="smr-window-layout-arrow"/>';
@@ -120,8 +121,8 @@ function addWindowStationLayout(floor, isHorizon, metadata) {
 
                 break;
             case 'r':
-            insertedSvgCode += '<title>' + name + '</title>';
-                insertedSvgCode += '<rect x="0" y="' + (index * 20) + '" width="200" height="20" class="smr-window-layout smr-window-layout--' + className + '"/>';
+                insertedSvgCode += '<title>' + name + '</title>';
+                insertedSvgCode += '<rect x="0" y="' + (index * 20) + '" width="200" height="20" class="smr-window-layout smr-window-layout--' + name.replace(' ', '-') + '"/>';
 
                 insertedSvgCode += '<line x1="10" y1="' + (index * 20 + 9) + '" x2="190" y2="' + (index * 20 + 9) + '" class="smr-window-layout-arrow"/>';
                 insertedSvgCode += '<line x1="190" y1="' + (index * 20 + 9) + '" x2="180" y2="' + (index * 20 + 5) + '" class="smr-window-layout-arrow"/>';
@@ -129,8 +130,8 @@ function addWindowStationLayout(floor, isHorizon, metadata) {
 
                 break;
             case 'u':
-            insertedSvgCode += '<title>' + name + '</title>';
-                insertedSvgCode += '<rect y="0" x="' + (index * 20) + '" width="20" height="200" class="smr-window-layout smr-window-layout--' + className + '"/>';
+                insertedSvgCode += '<title>' + name + '</title>';
+                insertedSvgCode += '<rect y="0" x="' + (index * 20) + '" width="20" height="200" class="smr-window-layout smr-window-layout--' + name.replace(' ', '-') + '"/>';
 
                 insertedSvgCode += '<line y1="10" x1="' + (index * 20 + 9) + '" y2="190" x2="' + (index * 20 + 9) + '" class="smr-window-layout-arrow"/>';
                 insertedSvgCode += '<line y1="10" x1="' + (index * 20 + 9) + '" y2="20" x2="' + (index * 20 + 5) + '" class="smr-window-layout-arrow"/>';
@@ -138,8 +139,8 @@ function addWindowStationLayout(floor, isHorizon, metadata) {
 
                 break;
             case 'd':
-            insertedSvgCode += '<title>' + name + '</title>';
-                insertedSvgCode += '<rect y="0" x="' + (index * 20) + '" width="20" height="200" class="smr-window-layout smr-window-layout--' + className + '"/>';
+                insertedSvgCode += '<title>' + name + '</title>';
+                insertedSvgCode += '<rect y="0" x="' + (index * 20) + '" width="20" height="200" class="smr-window-layout smr-window-layout--' + name.replace(' ', '-') + '"/>';
 
                 insertedSvgCode += '<line y1="10" x1="' + (index * 20 + 9) + '" y2="190" x2="' + (index * 20 + 9) + '" class="smr-window-layout-arrow"/>';
                 insertedSvgCode += '<line y1="190" x1="' + (index * 20 + 9) + '" y2="180" x2="' + (index * 20 + 5) + '" class="smr-window-layout-arrow"/>';
@@ -149,7 +150,6 @@ function addWindowStationLayout(floor, isHorizon, metadata) {
         }
 
         insertedSvgCode += '</g>'
-        index++;
     }
 
     insertedSvgCode += "</svg></div>";

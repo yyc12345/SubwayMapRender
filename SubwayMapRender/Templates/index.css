@@ -7,6 +7,18 @@
     stroke-dasharray: 10, 10;
 }
 
+.smr-svg-text-name {
+    font-size: 20px;
+    font-weight: bold;
+    fill: black;
+}
+
+.smr-svg-text-subtitle {
+    font-size: 16px;
+    font-style: italic;
+    fill: gray;
+}
+
 .smr-window-layout {
     stroke-width: 0;
 }

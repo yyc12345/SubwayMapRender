@@ -49,7 +49,7 @@ namespace SubwayMapRender.DataStruct {
         public static string RailLayoutListToString(List<RailLayoutItem> list) {
             string[] strl = new string[list.Count];
             for(int i = 0; i < list.Count; i++) {
-                strl[i] = TowardToString(list[i].Toward) + list[i].AttachLine;
+                strl[i] = TowardToString(list[i].Toward) + "#" + list[i].AttachLine;
             }
             return String.Join(',', strl);
         }

@@ -86,7 +86,7 @@ namespace SubwayMapRender {
                         fsJs.WriteLine($"case '{_lineName}-{i}':");
                         fsJs.WriteLine($"setWindowLine('{line.LineColor.ToString()}', '{line.LineName}');");
                         foreach (var builders in line.NodeList[i].FollowingBuilder) {
-                            fsJs.WriteLine($"addWindowLineBuider('{builders.Segment}', '{builders.Builder}');");
+                            fsJs.WriteLine($"addWindowLineBuilder('{builders.Segment}', '{builders.Builder}');");
                         }
                         fsJs.WriteLine("break;");
                     }
@@ -105,8 +105,8 @@ namespace SubwayMapRender {
                 string _lineName = line.LineName.Replace(" ", "-");
                 foreach (var node in line.NodeList) {
                     if (node.AttachedStationId != "") {
-                        if (attachStation.ContainsKey(node.AttachedStationId)) attachStation[node.AttachedStationId] += $" {_lineName}";
-                        else attachStation.Add(node.AttachedStationId, $" {_lineName}");
+                        if (attachStation.ContainsKey(node.AttachedStationId)) attachStation[node.AttachedStationId] += $" smr-display--{_lineName}";
+                        else attachStation.Add(node.AttachedStationId, $" smr-display--{_lineName}");
                     }
                 }
             }
@@ -120,21 +120,37 @@ namespace SubwayMapRender {
             string className = "";
             foreach (var station in map.StationList) {
                 //write html
+                //render circle
                 if (attachStation.ContainsKey(station.StationId)) className = attachStation[station.StationId];
                 else className = "";
                 fsHtml.WriteLine($"<g onclick=\"showWindowStation('{station.StationId}')\" class=\"smr-display-station{className}\">");
 
                 CoordinateConverter(station.Position.X, station.Position.Z, negX, negZ, ref x, ref y);
-                if (station.IsBuilding) fsHtml.WriteLine($"<circle cx=\"{x - 10}\" cy=\"{y - 10}\" r=\"10\" style=\"stroke: black; stroke-width; fill: gray;\"/>");
-                else fsHtml.WriteLine($"<circle cx=\"{x - 10}\" cy=\"{y - 10}\" r=\"10\" style=\"stroke: black; stroke-width; fill: white;\"/>");
+                if (station.IsBuilding) fsHtml.WriteLine($"<circle cx=\"{x - 4}\" cy=\"{y - 4}\" r=\"10\" style=\"stroke: black; stroke-width; fill: gray;\"/>");
+                else fsHtml.WriteLine($"<circle cx=\"{x - 4}\" cy=\"{y - 4}\" r=\"10\" style=\"stroke: black; stroke-width; fill: white;\"/>");
 
-                fsHtml.WriteLine("</g>");
+                //render text
+                int offsetX = (int)(Math.Cos((double)station.RenderDirection / 360 * 2 * Math.PI) * station.RenderOffset);
+                int offsetY = -(int)(Math.Sin((double)station.RenderDirection / 360 * 2 * Math.PI) * station.RenderOffset);
+                fsHtml.WriteLine("<text>");
+
+                if (offsetX < 0) {
+                    //right align
+                    fsHtml.WriteLine($"<tspan style=\"text-anchor: end;\" class=\"smr-svg-text-name\" x=\"{x + offsetX}\" y=\"{y + offsetY}\">{station.StationName}</tspan>");
+                    fsHtml.WriteLine($"<tspan style=\"text-anchor: end;\" class=\"smr-svg-text-subtitle\" x=\"{x + offsetX}\" y=\"{y + offsetY + 20}\">{station.StationSubtitle}</tspan>");
+                } else {
+                    //left align
+                    fsHtml.WriteLine($"<tspan class=\"smr-svg-text-name\" x=\"{x + offsetX}\" y=\"{y + offsetY}\">{station.StationName}</tspan>");
+                    fsHtml.WriteLine($"<tspan class=\"smr-svg-text-subtitle\" x=\"{x + offsetX}\" y=\"{y + offsetY + 20}\">{station.StationSubtitle}</tspan>");
+                }
+
+                fsHtml.WriteLine("</text></g>");
 
                 //write js
                 fsJs.WriteLine($"case '{station.StationId}':");
-                fsJs.WriteLine($"setWindowStation('{station.StationName}', '{station.StationSubtitle}', '{station.StationId}', '{station.StationDescription}', '{station.Position.X}', '{station.Position.Y}', '{station.Position.Z}');");
+                fsJs.WriteLine($"setWindowStation(\"{station.StationName}\", \"{station.StationSubtitle}\", \"{station.StationId}\", \"{station.StationDescription}\", '{station.Position.X}', '{station.Position.Y}', '{station.Position.Z}');");
                 foreach (var builders in station.Builder) {
-                    fsJs.WriteLine($"addWindowStationBuider('{builders.Segment}', '{builders.Builder}');");
+                    fsJs.WriteLine($"addWindowStationBuilder('{builders.Segment}', '{builders.Builder}');");
                 }
                 foreach (var layout in station.StationLayoutList) {
                     fsJs.WriteLine($"addWindowStationLayout('{layout.Floor}', '{layout.IsHorizonStationLayout.ToString().ToLower()}', '{DataStruct.Converter.RailLayoutListToString(layout.RailLayoutList)}')");
