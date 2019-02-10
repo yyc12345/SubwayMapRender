@@ -1,10 +1,16 @@
 .smr-svg-line {
+    cursor: pointer;
+
     stroke-width: 5px;
     stroke-linecap: round;
 }
 
 .smr-svg-line-building {
     stroke-dasharray: 10, 10;
+}
+
+.smr-svg-station {
+    cursor: pointer;
 }
 
 .smr-svg-text-name {

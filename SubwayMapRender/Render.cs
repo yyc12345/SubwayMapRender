@@ -123,7 +123,7 @@ namespace SubwayMapRender {
                 //render circle
                 if (attachStation.ContainsKey(station.StationId)) className = attachStation[station.StationId];
                 else className = "";
-                fsHtml.WriteLine($"<g onclick=\"showWindowStation('{station.StationId}')\" class=\"smr-display-station{className}\">");
+                fsHtml.WriteLine($"<g onclick=\"showWindowStation('{station.StationId}')\" class=\"smr-svg-station smr-display-station{className}\">");
 
                 CoordinateConverter(station.Position.X, station.Position.Z, negX, negZ, ref x, ref y);
                 if (station.IsBuilding) fsHtml.WriteLine($"<circle cx=\"{x - 4}\" cy=\"{y - 4}\" r=\"10\" style=\"stroke: black; stroke-width; fill: gray;\"/>");
