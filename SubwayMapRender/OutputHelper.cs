@@ -25,9 +25,9 @@ namespace SubwayMapRender {
         }
 
         public static void OutputStationList(List<DataStruct.StationItem> obj) {
-            var table = new ConsoleTable("Id", "Name", "Subtitle", "Is building?", "Render direction", "Render Offset", "Builder count", "Layout count", "Description");
+            var table = new ConsoleTable("Id", "Name", "Position", "Subtitle", "Is building?", "Render direction", "Render Offset", "Builder count", "Layout count", "Description");
             foreach (var item in obj) {
-                table.AddRow(item.StationId, item.StationName, item.StationSubtitle, item.IsBuilding.ToString(), item.RenderDirection.ToString(), item.RenderOffset.ToString(), item.Builder.Count.ToString(), item.StationLayoutList.Count.ToString(), item.StationDescription);
+                table.AddRow(item.StationId, item.StationName, item.Position.ToString(), item.StationSubtitle, item.IsBuilding.ToString(), item.RenderDirection.ToString(), item.RenderOffset.ToString(), item.Builder.Count.ToString(), item.StationLayoutList.Count.ToString(), item.StationDescription);
             }
             Console.Write(table.ToStringAlternative());
             Console.WriteLine();
@@ -38,6 +38,8 @@ namespace SubwayMapRender {
             Console.WriteLine(data.StationId);
             ConsoleAssistance.Write("Station name: ", ConsoleColor.Yellow);
             Console.WriteLine(data.StationName);
+            ConsoleAssistance.Write("Station position: ", ConsoleColor.Yellow);
+            Console.WriteLine(data.Position.ToString());
             ConsoleAssistance.Write("Station subtitle: ", ConsoleColor.Yellow);
             Console.WriteLine(data.StationSubtitle);
             ConsoleAssistance.Write("Is building: ", ConsoleColor.Yellow);

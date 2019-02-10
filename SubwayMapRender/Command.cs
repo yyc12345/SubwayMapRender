@@ -463,6 +463,40 @@ namespace SubwayMapRender {
 
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
+                case "pos":
+                    if (sp.Count == 4) {
+                        //search
+                        var search = from item in obj
+                                     where item.StationId == sp[0]
+                                     select item;
+                        if (!search.Any()) {
+                            ConsoleAssistance.WriteLine("No matched item", ConsoleColor.Red);
+                            return true;
+                        }
+
+                        //check param
+                        int x = 0, y = 0, z = 0;
+                        try {
+                            if (sp[1] != "~")
+                                x = int.Parse(sp[1]);
+                            if (sp[2] != "~")
+                                y = int.Parse(sp[2]);
+                            if (sp[3] != "~")
+                                z = int.Parse(sp[3]);
+                        } catch (Exception) {
+                            ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
+                            return true;
+                        }
+                        
+                        var operate = search.First();
+                        if (sp[1] == "~") x = operate.Position.X;
+                        if (sp[2] == "~") y = operate.Position.Y;
+                        if (sp[3] == "~") z = operate.Position.Z;
+
+                        operate.Position = new DataStruct.Coordinate(x, y, z);
+
+                    } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
+                    break;
                 case "builder":
                     if (sp.Count == 1) {
                         //search
@@ -905,6 +939,7 @@ namespace SubwayMapRender {
             Console.WriteLine("\trm [id] - remove a station");
             Console.WriteLine("\tre [id] [new-id] - rename a station");
             Console.WriteLine("\tedit [id] [name] [subtitle] [is-building] [render-direction] [render-offset] [description] - set specific station's data");
+            Console.WriteLine("\tpos [id] [x] [y] [z] - set station's position");
             Console.WriteLine("\tbuilder [id] - invoke builder editor");
             Console.WriteLine("\tlayout [id] - invoke layout editor");
             Console.WriteLine("\tback - back to main editor");
