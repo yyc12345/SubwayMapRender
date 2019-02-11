@@ -21,14 +21,15 @@ namespace SubwayMapRender {
             File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "index.html"), Path.Combine(Environment.CurrentDirectory, "output", "index.html"), true);
             File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "index.css"), Path.Combine(Environment.CurrentDirectory, "output", "index.css"), true);
             File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "index.js"), Path.Combine(Environment.CurrentDirectory, "output", "index.js"), true);
+            File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "svg-transform.js"), Path.Combine(Environment.CurrentDirectory, "output", "svg-transform.js"), true);
             File.Copy(Path.Combine(Environment.CurrentDirectory, "Templates", "mui.css"), Path.Combine(Environment.CurrentDirectory, "output", "mui.css"), true);
 
             //output file
             /*
             Line 6 <title>{title}</title>
-            Line 31 <td class="mui--text-title">{title}</td>
-            Line 44 output svg: <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" style="flex: 1;">
-            Line 53 output line list (with button style)
+            Line 32 <td class="mui--text-title">{title}</td>
+            Line 45 output svg: <svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="100%" height="100%" style="flex: 1;">
+            Line 54 output line list (with button style)
             */
             var readerHtml = new StreamReader(Path.Combine(Environment.CurrentDirectory, "output", "index.html"), Encoding.UTF8);
             var fsHtml = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "generate.html"), false, Encoding.UTF8);
@@ -41,12 +42,12 @@ namespace SubwayMapRender {
             fsHtml.WriteLine($"<title>{map.Name}</title>");
 
             //write title 2================================================================================
-            CopyLimitedLine(31 - 6 - 1, readerHtml, fsHtml);
+            CopyLimitedLine(32 - 6 - 1, readerHtml, fsHtml);
             readerHtml.ReadLine();
             fsHtml.WriteLine($"<td class=\"mui--text-title\">{map.Name}</td>");
 
             //write svg body================================================================================
-            CopyLimitedLine(44 - 31 - 1, readerHtml, fsHtml);
+            CopyLimitedLine(45 - 32 - 1, readerHtml, fsHtml);
             readerHtml.ReadLine();
 
             //calc map size and write css at the same time
@@ -65,7 +66,7 @@ namespace SubwayMapRender {
             int height = posZ - negZ;
 
             //write svg size
-            fsHtml.WriteLine($"<svg xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" style=\"flex: 1;\"><g id=\"uiSvgRoot\">");
+            fsHtml.WriteLine($"<svg id=\"uiSvg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" style=\"flex: 1;user-select: none;\"><g id=\"uiSvgRoot\">");
 
             //write line =================================
             //output line and matched js
@@ -165,7 +166,7 @@ namespace SubwayMapRender {
             fsHtml.WriteLine($"</g></svg>");
 
             //write line btn body================================================================================
-            CopyLimitedLine(53 - 44 - 1, readerHtml, fsHtml);
+            CopyLimitedLine(54 - 45 - 1, readerHtml, fsHtml);
             readerHtml.ReadLine();
             foreach (var line in map.LineList) {
                 string _lineName = line.LineName.Replace(" ", "-");

@@ -23,6 +23,9 @@
     <None Update="Templates\mui.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Templates\svg-transform.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Templates\template.css">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
