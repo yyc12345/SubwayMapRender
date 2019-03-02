@@ -1,4 +1,5 @@
 ﻿using System;
+using ShareLib;
 
 namespace SubwayMapRender
 {
@@ -9,14 +10,14 @@ namespace SubwayMapRender
             ConsoleAssistance.WriteLine("Welcome to use Subway Map Render.", ConsoleColor.Yellow);
 
             //load
-            var globalConfig = ConfigManager.Read();
-            ConsoleAssistance.WriteLine("Load saved subway map OK.", ConsoleColor.Yellow);
+            var globalConfig = ConfigManager.Read<ShareLib.RenderStruct.RenderSettings>(ConfigManager.RenderSettingsFile);
+            ConsoleAssistance.WriteLine("Load saved render config OK.", ConsoleColor.Yellow);
 
             string command = "";
             while (true) {
                 ConsoleAssistance.Write("> ", ConsoleColor.Green);
-                command = ConsoleAssistance.ReadLine();
-                if (!Command.CommandProcessor(command, globalConfig)) break;
+                command = Console.ReadLine();
+                if (!Command.CommandProcessor(command, ref globalConfig)) break;
             }
 
             ConsoleAssistance.WriteLine("Thank you for your using.", ConsoleColor.Yellow);

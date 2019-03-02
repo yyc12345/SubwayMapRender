@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using ShareLib;
 
 namespace SubwayMapRender {
     public static class Render {
 
-        public static void RenderKernel(DataStruct.SubwayMap map) {
+        public static void RenderKernel(ShareLib.RenderStruct.RenderSettings renderSettings) {
 
-            if (!CheckData(map)) {
+            var map = LoadAndCheckData();
+            if (map is null) {
                 ConsoleAssistance.WriteLine("Your current map data is not suit for render. Please add more infomation.", ConsoleColor.Red);
                 return;
             }
@@ -154,7 +156,7 @@ namespace SubwayMapRender {
                     fsJs.WriteLine($"addWindowStationBuilder('{builders.Segment}', '{builders.Builder}');");
                 }
                 foreach (var layout in station.StationLayoutList) {
-                    fsJs.WriteLine($"addWindowStationLayout('{layout.Floor}', '{layout.IsHorizonStationLayout.ToString().ToLower()}', '{DataStruct.Converter.RailLayoutListToString(layout.RailLayoutList)}')");
+                    fsJs.WriteLine($"addWindowStationLayout('{layout.Floor}', '{layout.IsHorizonStationLayout.ToString().ToLower()}', '{ShareLib.DataStruct.Converter.RailLayoutListToString(layout.RailLayoutList)}')");
                 }
                 fsJs.WriteLine("break;");
             }
@@ -207,19 +209,22 @@ namespace SubwayMapRender {
             }
         }
 
-        static bool CheckData(DataStruct.SubwayMap map) {
+        static ShareLib.DataStruct.SubwayMap LoadAndCheckData() {
+
+            var map = ConfigManager.Read<ShareLib.DataStruct.SubwayMap>(ConfigManager.SubwayMapFile);
+
             foreach (var line in map.LineList) {
                 foreach (var node in line.NodeList) {
                     goto next;
                 }
             }
-            return false;
+            return null;
 
             next:
-            return true;
+            return map;
         }
 
-        static void WriteLineColor(string lineName, DataStruct.Color col, StreamWriter fs) {
+        static void WriteLineColor(string lineName, ShareLib.DataStruct.Color col, StreamWriter fs) {
             lineName = lineName.Replace(" ", "-");
             fs.WriteLine($".smr-svg-line--{lineName} {{");
             fs.WriteLine($"stroke: {col.ToString()};");

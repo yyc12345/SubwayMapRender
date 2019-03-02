@@ -54,37 +54,26 @@ function mouseWheelHandle(e) {
         angle = e.originalEvent.detail;
     } else angle = 0;
 
+    //pre calc translate
+    var sx = 0;
+    var sy = 0;
+    var cx = sx - currentTranslateX;
+    var cy = sy - currentTranslateY;
     var oldScale = getRealScale(currentScale);
+    var rx = cx / oldScale;
+    var ry = cy / oldScale;
 
     if (angle > 0) setCurrentScale(true, false);
     else if (angle < 0) setCurrentScale(false, false);
     else return;
 
-    //pre calc translate
-    var newScale = getRealScale(currentScale);
-    var sx = e.offsetX;
-    var sy = e.offsetY;
-
-    var newX = (sx / newScale) * newScale;
-    var newY = (sy / newScale) * newScale;
-
-    currentTranslateX += sx - newX;
-    currentTranslateY += sy - newY;
-    /*
-    var sx = 0;
-    var sy = 0;
-    var cx = sx - currentTranslateX;
-    var cy = sy - currentTranslateY;
-    
-    var rx = cx / oldScale;
-    var ry = cy / oldScale;
     //re-calc translate
-    
+    var newScale = getRealScale(currentScale);
     var newCx = rx * newScale;
     var newCy = ry * newScale;
     currentTranslateX = sx - newCx;
     currentTranslateY = sy - newCy;
-    */
+
     setScaleAndTranslate();
 }
 

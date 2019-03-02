@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace SubwayMapRender.DataStruct {
+namespace ShareLib.DataStruct {
 
     public static class Converter {
 

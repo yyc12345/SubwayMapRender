@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using ConsoleTables;
 
-namespace SubwayMapRender {
+namespace SubwayMapEditor {
     public static class OutputHelper {
 
-        public static void OutputLineList(List<DataStruct.LineItem> obj) {
+        public static void OutputLineList(List<ShareLib.DataStruct.LineItem> obj) {
             var table = new ConsoleTable("Name", "Color", "Node count");
             foreach (var item in obj) {
                 table.AddRow(item.LineName, item.LineColor.ToString(), item.NodeList.Count.ToString());
@@ -15,7 +15,7 @@ namespace SubwayMapRender {
             Console.WriteLine();
         }
 
-        public static void OutputLineItem(DataStruct.LineItem data) {
+        public static void OutputLineItem(ShareLib.DataStruct.LineItem data) {
             ConsoleAssistance.Write("Line name: ", ConsoleColor.Yellow);
             Console.WriteLine(data.LineName);
             ConsoleAssistance.Write("Line color: ", ConsoleColor.Yellow);
@@ -24,7 +24,7 @@ namespace SubwayMapRender {
             OutputNodeList(data.NodeList);
         }
 
-        public static void OutputStationList(List<DataStruct.StationItem> obj) {
+        public static void OutputStationList(List<ShareLib.DataStruct.StationItem> obj) {
             var table = new ConsoleTable("Id", "Name", "Position", "Subtitle", "Is building?", "Render direction", "Render Offset", "Builder count", "Layout count", "Description");
             foreach (var item in obj) {
                 table.AddRow(item.StationId, item.StationName, item.Position.ToString(), item.StationSubtitle, item.IsBuilding.ToString(), item.RenderDirection.ToString(), item.RenderOffset.ToString(), item.Builder.Count.ToString(), item.StationLayoutList.Count.ToString(), item.StationDescription);
@@ -33,7 +33,7 @@ namespace SubwayMapRender {
             Console.WriteLine();
         }
 
-        public static void OutputStationItem(DataStruct.StationItem data) {
+        public static void OutputStationItem(ShareLib.DataStruct.StationItem data) {
             ConsoleAssistance.Write("Station id: ", ConsoleColor.Yellow);
             Console.WriteLine(data.StationId);
             ConsoleAssistance.Write("Station name: ", ConsoleColor.Yellow);
@@ -56,7 +56,7 @@ namespace SubwayMapRender {
             OutputLayoutList(data.StationLayoutList);
         }
 
-        public static void OutputNodeList(List<DataStruct.LineNodeItem> obj) {
+        public static void OutputNodeList(List<ShareLib.DataStruct.LineNodeItem> obj) {
             var table = new ConsoleTable("Index", "Position", "Attached station id", "Rail width", "Is building?");
             int index = 0;
             foreach (var item in obj) {
@@ -73,7 +73,7 @@ namespace SubwayMapRender {
             Console.WriteLine();
         }
 
-        public static void OutputBuilderList(List<DataStruct.BuilderItem> obj) {
+        public static void OutputBuilderList(List<ShareLib.DataStruct.BuilderItem> obj) {
             var table = new ConsoleTable("Index", "Segment", "Builder");
             int innerIndex = 0;
             foreach (var item in obj) {
@@ -84,7 +84,7 @@ namespace SubwayMapRender {
             Console.WriteLine();
         }
 
-        public static void OutputLayoutList(List<DataStruct.StationLayoutItem> data) {
+        public static void OutputLayoutList(List<ShareLib.DataStruct.StationLayoutItem> data) {
             int index = 0;
             foreach (var item in data) {
                 Console.WriteLine("----------------------------");
@@ -125,19 +125,19 @@ namespace SubwayMapRender {
             }
         }
 
-        static string OutputToward(DataStruct.RailToward toward) {
+        static string OutputToward(ShareLib.DataStruct.RailToward toward) {
             switch (toward) {
-                case DataStruct.RailToward.Void:
+                case ShareLib.DataStruct.RailToward.Void:
                     return "XXXXX";
-                case DataStruct.RailToward.Platform:
+                case ShareLib.DataStruct.RailToward.Platform:
                     return "█████";
-                case DataStruct.RailToward.Up:
+                case ShareLib.DataStruct.RailToward.Up:
                     return "↑↑↑↑↑";
-                case DataStruct.RailToward.Down:
+                case ShareLib.DataStruct.RailToward.Down:
                     return "↓↓↓↓↓";
-                case DataStruct.RailToward.Left:
+                case ShareLib.DataStruct.RailToward.Left:
                     return "←←←←←";
-                case DataStruct.RailToward.Right:
+                case ShareLib.DataStruct.RailToward.Right:
                     return "→→→→→";
                 default:
                     return "XXXXX";
