@@ -292,7 +292,7 @@ namespace SubwayMapEditor {
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "edit":
-                    if (sp.Count == 2) {
+                    if (sp.Count == 3) {
                         //search
                         var search = from item in obj
                                      where item.LineName == sp[0]
@@ -302,13 +302,16 @@ namespace SubwayMapEditor {
                             return true;
                         }
 
-                        if (!hexColorRegex.IsMatch(sp[1])) {
+                        if (sp[1] != "~" && (!hexColorRegex.IsMatch(sp[1]))) {
                             ConsoleAssistance.WriteLine("Wrong formation", ConsoleColor.Red);
                             return true;
                         }
 
-                        search.First().LineColor = ShareLib.DataStruct.Converter.HexStringToColor(hexColorRegex.Match(sp[1]).Value);
-
+                        if (sp[1] != "~")
+                            search.First().LineColor = ShareLib.DataStruct.Converter.HexStringToColor(hexColorRegex.Match(sp[1]).Value);
+                        if (sp[2] != "~")
+                            search.First().AttachLine = sp[2];
+                        
                     } else ConsoleAssistance.WriteLine("Illegal parameter count", ConsoleColor.Red);
                     break;
                 case "node":
@@ -930,7 +933,7 @@ namespace SubwayMapEditor {
             Console.WriteLine("\tnew [line-name] - create new line (new)");
             Console.WriteLine("\trm [line-name] - remove a line (rm)");
             Console.WriteLine("\tre [line-name] [new-name] - rename a line");
-            Console.WriteLine("\tedit [line-name] [color] - change specific line's color");
+            Console.WriteLine("\tedit [line-name] [color] [attach-line] - change specific line's color");
             Console.WriteLine("\tnode [line-name] - invoke node editor");
             Console.WriteLine("\tback - back to main editor");
 

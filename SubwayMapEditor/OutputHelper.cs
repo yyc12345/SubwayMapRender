@@ -7,9 +7,9 @@ namespace SubwayMapEditor {
     public static class OutputHelper {
 
         public static void OutputLineList(List<ShareLib.DataStruct.LineItem> obj) {
-            var table = new ConsoleTable("Name", "Color", "Node count");
+            var table = new ConsoleTable("Name", "Color", "Node count", "Attach line");
             foreach (var item in obj) {
-                table.AddRow(item.LineName, item.LineColor.ToString(), item.NodeList.Count.ToString());
+                table.AddRow(item.LineName, item.LineColor.ToString(), item.NodeList.Count.ToString(), item.AttachLine);
             }
             Console.Write(table.ToStringAlternative());
             Console.WriteLine();

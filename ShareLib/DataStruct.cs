@@ -121,10 +121,12 @@ namespace ShareLib.DataStruct {
     public class LineItem {
         public LineItem() {
             LineName = "";
+            AttachLine = "";
             LineColor = new Color(0, 0, 0);
             NodeList = new List<LineNodeItem>();
         }
         public string LineName { get; set; }
+        public string AttachLine { get; set; }
         public Color LineColor { get; set; }
         public List<LineNodeItem> NodeList { get; set; }
     }

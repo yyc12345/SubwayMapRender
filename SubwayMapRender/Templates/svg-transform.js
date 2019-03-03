@@ -6,7 +6,7 @@ oldPosY = 0;
 newPosX = 0;
 newPosY = 0;
 
-currentScale = 1;
+currentScale = 1.0;
 currentTranslateX = 0;
 currentTranslateY = 0;
 
@@ -55,8 +55,8 @@ function mouseWheelHandle(e) {
     } else angle = 0;
 
     //pre calc translate
-    var sx = 0;
-    var sy = 0;
+    var sx = e.offsetX;
+    var sy = e.offsetY;
     var cx = sx - currentTranslateX;
     var cy = sy - currentTranslateY;
     var oldScale = getRealScale(currentScale);

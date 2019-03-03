@@ -38,6 +38,8 @@ namespace SubwayMapRender {
             var fsCss = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "generate.css"), false, Encoding.UTF8);
             var fsJs = new StreamWriter(Path.Combine(Environment.CurrentDirectory, "output", "generate.js"), false, Encoding.UTF8);
 
+            #region pre-process
+
             //write title 1================================================================================
             CopyLimitedLine(5, readerHtml, fsHtml);
             readerHtml.ReadLine();
@@ -70,6 +72,10 @@ namespace SubwayMapRender {
             //write svg size
             fsHtml.WriteLine($"<svg id=\"uiSvg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\" width=\"100%\" height=\"100%\" style=\"flex: 1;user-select: none;\"><g id=\"uiSvgRoot\">");
 
+            #endregion
+
+            #region write-line
+
             //write line =================================
             //output line and matched js
             //write js head
@@ -80,14 +86,15 @@ namespace SubwayMapRender {
             foreach (var line in map.LineList) {
                 if (line.NodeList.Count > 1) {
                     string _lineName = line.LineName.Replace(" ", "-");
+                    string _displayLineName = (((!renderSettings.KeepIndependentAttachLine) && line.AttachLine != "") ? line.AttachLine.Replace(" ", "-") : _lineName);
                     for (int i = 0; i < line.NodeList.Count - 1; i++) {
                         CoordinateConverter(line.NodeList[i].NodePosition.X, line.NodeList[i].NodePosition.Z, negX, negZ, ref x, ref y);
                         CoordinateConverter(line.NodeList[i + 1].NodePosition.X, line.NodeList[i + 1].NodePosition.Z, negX, negZ, ref _x, ref _y);
                         //write html
-                        fsHtml.WriteLine($"<line onclick=\"showWindowLine('{_lineName}-{i}')\" x1=\"{x}\" y1=\"{y}\" x2=\"{_x}\" y2=\"{_y}\" class=\"smr-display-line smr-display--{_lineName} smr-svg-line smr-svg-line--{_lineName}{(line.NodeList[i].FollowingRailIsBuilding ? " smr-svg-line-building" : "")}\"/>");
+                        fsHtml.WriteLine($"<line onclick=\"showWindowLine('{_lineName}-{i}')\" x1=\"{x}\" y1=\"{y}\" x2=\"{_x}\" y2=\"{_y}\" class=\"smr-display-line smr-display--{_displayLineName} smr-svg-line smr-svg-line--{_lineName}{(line.NodeList[i].FollowingRailIsBuilding ? " smr-svg-line-building" : "")}\"/>");
                         //write js
                         fsJs.WriteLine($"case '{_lineName}-{i}':");
-                        fsJs.WriteLine($"setWindowLine('{line.LineColor.ToString()}', '{line.LineName}');");
+                        fsJs.WriteLine($"setWindowLine('{line.LineColor.ToString()}', '{(renderSettings.KeepIndependentAttachLine ? line.LineName : line.AttachLine)}');");
                         foreach (var builders in line.NodeList[i].FollowingBuilder) {
                             fsJs.WriteLine($"addWindowLineBuilder('{builders.Segment}', '{builders.Builder}');");
                         }
@@ -99,6 +106,9 @@ namespace SubwayMapRender {
             //write js foot
             fsJs.WriteLine("}}");
 
+            #endregion
+
+            #region write-station
 
             //write station ================================
 
@@ -106,10 +116,11 @@ namespace SubwayMapRender {
             var attachStation = new Dictionary<string, string>();
             foreach (var line in map.LineList) {
                 string _lineName = line.LineName.Replace(" ", "-");
+                string _displayLineName = (((!renderSettings.KeepIndependentAttachLine) && line.AttachLine != "") ? line.AttachLine.Replace(" ", "-") : _lineName);
                 foreach (var node in line.NodeList) {
                     if (node.AttachedStationId != "") {
-                        if (attachStation.ContainsKey(node.AttachedStationId)) attachStation[node.AttachedStationId] += $" smr-display--{_lineName}";
-                        else attachStation.Add(node.AttachedStationId, $" smr-display--{_lineName}");
+                        if (attachStation.ContainsKey(node.AttachedStationId)) attachStation[node.AttachedStationId] += $" smr-display--{_displayLineName}";
+                        else attachStation.Add(node.AttachedStationId, $" smr-display--{_displayLineName}");
                     }
                 }
             }
@@ -167,10 +178,13 @@ namespace SubwayMapRender {
             //finish svg foot
             fsHtml.WriteLine($"</g></svg>");
 
+            #endregion
+
             //write line btn body================================================================================
             CopyLimitedLine(54 - 45 - 1, readerHtml, fsHtml);
             readerHtml.ReadLine();
             foreach (var line in map.LineList) {
+                if ((!renderSettings.KeepIndependentAttachLine) && line.AttachLine != "") continue;
                 string _lineName = line.LineName.Replace(" ", "-");
                 fsHtml.WriteLine($"<button onclick=\"setDisplay('{_lineName}');\" class=\"mui-btn mui-btn--raised mui-btn--primary\">");
                 fsHtml.WriteLine($"<p><font color=\"{line.LineColor.ToString()}\">█▌</font> {line.LineName}</p>");
